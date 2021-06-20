@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.SysUsrMapper">
+    <resultMap id="SysUsrMap" type="com.haoshuai.app.entity.SysUser">
+        <id column="s_uid" property="sUid"/>
+        <result column="s_uname" property="sUname"/>
+        <result column="s_upwd" property="sUpwd"/>
+        <result column="s_cname" property="sCname"/>
+        <result column="s_ugender" property="sUgender"/>
+        <result column="s_uphone" property="sUphone"/>
+        <result column="s_ustatus" property="sUstatus"/>
+        <result column="s_surid" property="sSurid"/>
+        <result column="s_wstatus" property="sWstatus"/>
+        <association property="sysUserRole" javaType="com.haoshuai.app.entity.SysUserRole">
+            <id column="s_urid" property="sUrid"/>
+            <result column="s_urname" property="sUrname"/>
+            <result column="s_mid" property="sMid"/>
+        </association>
+    </resultMap>
+
+    <!--修改信息字段-->
+    <sql id="modifyInfoC1">
+        <set>
+            <if test="sCname!=null and sCname!=''">
+                s_cname = #{sCname},
+            </if>
+            <if test="sUgender!=null and sUgender!='' or sUgender==0">
+                s_ugender = #{sUgender},
+            </if>
+            <if test="sUphone!=null and sUphone!=''">
+                s_uphone = #{sUphone},
+            </if>
+            <if test="sWstatus!=null and sWstatus!='' or sWstatus==0">
+                s_wstatus = #{sWstatus}
+            </if>
+        </set>
+    </sql>
+    <!--插入用户字段1-->
+    <sql id="addUserC1">
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sUname!=null and sUname!=''">
+                s_uname,
+            </if>
+            <if test="sCname!=null and sCname!=''">
+                s_cname,
+            </if>
+            <if test="sUpwd!=null and sUpwd!=''">
+                s_upwd,
+            </if>
+            <if test="sUgender!=null and sUgender!='' or sUgender==0">
+                s_ugender,
+            </if>
+            <if test="sUphone!=null and sUphone!=''">
+                s_uphone,
+            </if>
+            <if test="sUstatus!=null and sUstatus!='' or sUstatus==0">
+                s_ustatus,
+            </if>
+            <if test="sSurid!=null and sSurid!=''">
+                s_surid,
+            </if>
+            <if test="sWstatus!=null and sWstatus!='' or sWstatus==0">
+                s_wstatus
+            </if>
+        </trim>
+    </sql>
+    <!--添加用户字段2-->
+    <sql id="addUserC2">
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sUname!=null and sUname!=''">
+                #{sUname},
+            </if>
+            <if test="sCname!=null and sCname!=''">
+                #{sCname},
+            </if>
+            <if test="sUpwd!=null and sUpwd!=''">
+                #{sUpwd},
+            </if>
+            <if test="sUgender!=null and sUgender!='' or sUgender==0">
+                #{sUgender},
+            </if>
+            <if test="sUphone!=null and sUphone!=''">
+                #{sUphone},
+            </if>
+            <if test="sUstatus!=null and sUstatus!='' or sUstatus==0">
+                #{sUstatus},
+            </if>
+            <if test="sSurid!=null and sSurid!=''">
+                #{sSurid},
+            </if>
+            <if test="sWstatus!=null and sWstatus!='' or sWstatus==0">
+                #{sWstatus}
+            </if>
+        </trim>
+    </sql>
+    <!--多条件查询字段-->
+    <sql id="searchUsrInfoC">
+        <where>
+            <if test="sk.sUname!=null and sk.sUname!=''">
+                and s_uname like concat('%',#{sk.sUname},'%')
+            </if>
+            <if test="sk.sCname!=null and sk.sCname!=''">
+                and s_cname like concat('%',#{sk.sCname},'%')
+            </if>
+        </where>
+    </sql>
+    <!--更新用户字段-->
+    <sql id="modifyInfoC2">
+        <set>
+            <if test="sCname!=null and sCname!=''">
+                s_cname = #{sCname},
+            </if>
+            <if test="sUgender!=null and sUgender!=''">
+                s_ugender = #{sUgender},
+            </if>
+            <if test="sUphone!=null and sUphone!=''">
+                s_uphone = #{sUphone},
+            </if>
+            <if test="sSurid!=null and sSurid!=''">
+                s_surid = #{sSurid},
+            </if>
+            <if test="sWstatus!=null and sWstatus!=''">
+                s_wstatus = #{sWstatus}
+            </if>
+        </set>
+    </sql>
+
+    <select id="login" resultMap="SysUsrMap">
+        select *
+        from view_sys_user
+        where s_uname = #{sUname}
+    </select>
+
+    <select id="userInfo" resultMap="SysUsrMap">
+        select *
+        from view_sys_user
+        where s_uname = #{sUname}
+    </select>
+
+    <update id="modifyInfo">
+        update sys_user
+        <include refid="modifyInfoC1"></include>
+        where s_uname = #{sUname}
+    </update>
+
+    <update id="modifyPwd">
+        update sys_user
+        set s_upwd = #{sUpwd}
+        where s_uname = #{sUname}
+    </update>
+    
+    <insert id="addUser">
+        insert into
+        sys_user
+        <include refid="addUserC1"></include>
+        values
+        <include refid="addUserC2"></include>
+    </insert>
+
+    <select id="getUsrInfo" resultMap="SysUsrMap">
+        select *
+        from view_sys_user
+        limit #{page},#{limit}
+    </select>
+
+    <select id="getAllUsrInfo" resultMap="SysUsrMap">
+        select *
+        from view_sys_user
+    </select>
+
+    <select id="searchUsrInfo" resultMap="SysUsrMap">
+        select *
+        from view_sys_user
+        <include refid="searchUsrInfoC"></include>
+        limit #{page},#{limit}
+    </select>
+    
+    <select id="searchAllUsrInfo" resultMap="SysUsrMap">
+        select *
+        from view_sys_user
+        <include refid="searchUsrInfoC"></include>
+    </select>
+
+    <update id="activeUser">
+        update sys_user
+        set s_ustatus = 0
+        where s_uname = #{sUname}
+    </update>
+
+    <update id="stopUser">
+        update sys_user
+        set s_ustatus = 1
+        where s_uname = #{sUname}
+    </update>
+
+    <delete id="deleteUser">
+        delete
+        from sys_user
+        where s_uname = #{sUname}
+    </delete>
+
+    <update id="editUser">
+        update sys_user
+        <include refid="modifyInfoC2"></include>
+        where s_uname = #{sUname}
+    </update>
+
+    <delete id="deleteManyUser">
+        delete
+        from sys_user
+        where s_uname in
+        <foreach collection="array" item="e" open="(" separator="," close=")">
+            #{e}
+        </foreach>
+    </delete>
+</mapper>

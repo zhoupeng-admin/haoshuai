@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.FamilyPastHistoryMapper">
+    <resultMap id="FPHMap" type="com.haoshuai.app.entity.FamilyPastHistory">
+        <id column="p_id" property="pId"/>
+        <result column="p_family_history" property="pFamilyHistory"/>
+        <result column="p_past_medical_history" property="pPastMedicalHistory"/>
+        <result column="p_allergic_history" property="pAllergicHistory"/>
+    </resultMap>
+
+    <!--插入字段-->
+    <sql id="addPFPHC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="pId!=null and pId!=''">
+                p_id,
+            </if>
+            <if test="pFamilyHistory!=null and pFamilyHistory!=''">
+                p_family_history,
+            </if>
+            <if test="pPastMedicalHistory!=null and pPastMedicalHistory!=''">
+                p_past_medical_history,
+            </if>
+            <if test="pAllergicHistory!=null and pAllergicHistory!=''">
+                p_allergic_history
+            </if>
+        </trim>
+    </sql>
+    <sql id="addPFPHC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="pId!=null and pId!=''">
+                #{pId},
+            </if>
+            <if test="pFamilyHistory!=null and pFamilyHistory!=''">
+                #{pFamilyHistory},
+            </if>
+            <if test="pPastMedicalHistory!=null and pPastMedicalHistory!=''">
+                #{pPastMedicalHistory},
+            </if>
+            <if test="pAllergicHistory!=null and pAllergicHistory!=''">
+                #{pAllergicHistory}
+            </if>
+        </trim>
+    </sql>
+    <!--更新字段-->
+    <sql id="modifyPFPC">
+        <set>
+                p_family_history = #{pFamilyHistory},
+                p_past_medical_history = #{pPastMedicalHistory},
+                p_allergic_history = #{pAllergicHistory}
+        </set>
+    </sql>
+
+    <insert id="addPatientFamilyPastHistory">
+        insert into family_past_history
+        <include refid="addPFPHC1"></include>
+        value
+        <include refid="addPFPHC2"></include>
+    </insert>
+
+    <delete id="deleteManyPatientFamilyPastHistory">
+        delete from family_past_history where p_id in
+        <foreach collection="array" item="e" open="(" separator="," close=")">
+            #{e}
+        </foreach>
+    </delete>
+
+    <select id="familyPastHistoryInfoBypId" resultMap="FPHMap">
+        select *
+        from family_past_history
+        where p_id = #{pId}
+    </select>
+    
+    <update id="modifyPatientFamilyPastHistory">
+        update family_past_history
+        <include refid="modifyPFPC"></include>
+        where p_id = #{pId}
+    </update>
+
+    <delete id="deletePatientFamilyPastHistory">
+        delete from family_past_history where p_id = #{pId}
+    </delete>
+</mapper>

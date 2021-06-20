@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>器械维修管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/public.css}" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="" id="search_form">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">设备名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="eName" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">设备流水号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="eId" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">维修流水号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="emId" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" id="save" class="layui-btn layui-btn-primary" lay-submit=""
+                                    data-type="reload"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            {{# if(d.equip.eMaintenance == '1'){ }}
+            <button class="layui-btn layui-btn-warm layui-btn-xs data-count-edit" lay-event="stop_repair">结束维修</button>
+            {{# }else{ }}
+            <button class="layui-btn layui-btn-warm layui-btn-xs data-count-edit" disabled="" lay-event="stop_repair"
+                    style="background: darkgrey">结束维修
+            </button>
+            {{# } }}
+            {{# if(d.equip.eWhetherSpend == '0'){  }}
+            <button class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="fee_settlement">费用结算</button>
+            {{# }else{  }}
+            <button class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" disabled="" lay-event="fee_settlement"
+            style="background: gray">费用结算
+            </button>
+            {{# } }}
+        </script>
+
+    </div>
+</div>
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#currentTableId',
+            url: '/app/GenSys/get_equip_maintenancelist.do',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [
+                [
+                    {type: "checkbox", width: 50},
+                    {type: 'numbers', title: '序号', align: 'center', width: 80},
+                    {field: 'emId', align: 'center', width: 175, title: '维修流水号'},
+                    {field: 'eId', align: 'center', width: 175, title: '设备流水号'},
+                    {
+                        field: 'eName',
+                        align: 'center',
+                        width: 140,
+                        title: '设备名称'
+                    },
+                    {
+                        field: 'emPhone', align: 'center', width: 120, title: '联系人'
+                    },
+                    {
+                        field: 'equip.equip', align: 'center', width: 120, title: '维修状态', templet: function (data) {
+                            if (data.equip.eMaintenance == 0) {
+                                return "未开始";
+                            }
+                            if (data.equip.eMaintenance == 1) {
+                                return "进行中";
+                            }
+                            if (data.equip.eMaintenance == 2) {
+                                return "已结束";
+                            }
+                        }
+                    },
+                    {
+                        field: 'equip.equip', align: 'center', width: 120, title: '费用支付状态', templet: function (data) {
+                            return data.equip.eWhetherSpen == 0 ? '未支付' : '已支付';
+                        }
+                    },
+                    {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                ]
+            ],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 15,
+            page: true,
+            // skin: 'line'
+        });
+
+        var active = {
+            reload: function () {
+                var index = layer.load(2);
+                var form_data = $("#search_form").serializeArray();
+                var arr = [];
+                $.each(form_data, function () {
+                    arr[this.name] = this.value;
+                });
+                console.log(arr.bPrice);
+                //执行搜索重载
+                table.reload('currentTableId', {
+                    url: '/app/GenSys/search_equip_maintenancelist.do',
+                    method: 'post',
+                    page: {
+                        curr: 1
+                    }
+                    , where: {
+                        eName: arr.eName,
+                        eId: arr.eId,
+                        emId: arr.emId,
+                        done: function () {
+                            layer.close(index);
+                        }
+                    }
+                });
+            }
+        }
+
+        // 监听搜索操作
+        $('#save').on('click', function () {
+            var type = $(this).data('type');
+            var data = $("#search_form").serializeArray();
+            var flag = 0;
+            console.log(data);
+            $.each(data, function () {
+                if (this.value != '') {
+                    flag++;
+                }
+            });
+            if (flag == 0) {
+                layer.msg('查询内容不能为空');
+                return false;
+            }
+            active[type] ? active[type].call(this) : '';
+        });
+
+        $(document).on('keydown', function (e) {
+            if (e.keyCode == 13) {
+                $("#save").trigger('click');
+                return false;
+            }
+        });
+
+        /**
+         * toolbar监听事件
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {  // 监听添加操作
+                var index = layer.open({
+                    title: '添加设备维修信息',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['90%', '80%'],
+                    content: '/app/bs/equip_maintenance_add',
+                });
+            }
+        });
+
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            console.log(obj)
+        });
+
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event == 'stop_repair') {
+                layer.confirm('是否停止维修?', function () {
+                    console.log(data);
+                    $.ajax({
+                        url: '/app/GenSys/stop_repair_equip.do',
+                        method: 'post',
+                        data: {
+                            eId: data.eId
+                        },
+                        dataType: 'json',
+                        success(res) {
+                            layer.msg(res.msg, {icon: res.code, time: 800}, function () {
+                                layer.msg('请及时支付维修费用',{icon:1,time:800},function () {
+                                    location.reload();
+                                })
+                            })
+                        }
+                    })
+                })
+            }
+            if(obj.event == 'fee_settlement'){
+                var index = layer.open({
+                    title: '设备维修费用结算',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['90%', '80%'],
+                    content: '/app/bs/equip_maintenance_fee_add?emId='+data.emId+'&eId='+data.eId,
+                });
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>

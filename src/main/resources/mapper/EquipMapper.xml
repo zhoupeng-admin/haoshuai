@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.EquipMapper">
+    <resultMap id="EquipMap" type="com.haoshuai.app.entity.Equip">
+        <id column="e_id" property="eId"/>
+        <result column="e_name" property="eName"/>
+        <result column="e_number" property="eNumber"/>
+        <result column="e_factory_date" property="eFactoryDate"/>
+        <result column="e_purchase_date" property="ePurchaseDate"/>
+        <result column="e_factory" property="eFactory"/>
+        <result column="e_unit_price" property="eUnitPrice"/>
+        <result column="e_status" property="eStatus"/>
+        <result column="e_maintenance"/>
+        <result column="e_whether_spend" property="eWhetherSpend"/>
+    </resultMap>
+
+    <!--插入字段-->
+    <sql id="addEquipC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="eName!=null and eName!=''">
+                e_name,
+            </if>
+            <if test="eNumber!=null and eNumber!=''">
+                e_number,
+            </if>
+            <if test="eFactoryDate!=null">
+                e_factory_date,
+            </if>
+            <if test="ePurchaseDate!=null">
+                e_purchase_date,
+            </if>
+            <if test="eFactory!=null and eFactory!=''">
+                e_factory,
+            </if>
+            <if test="eUnitPrice!=null and eUnitPrice!=''">
+                e_unit_price,
+            </if>
+            <if test="eStatus!=null and eStatus!='' or eStatus==0">
+                e_status,
+            </if>
+            <if test="eMaintenance!=null and eMaintenance!='' or eMaintenance==0">
+                e_maintenance
+            </if>
+        </trim>
+    </sql>
+    <sql id="addEquipC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="eName!=null and eName!=''">
+                #{eName},
+            </if>
+            <if test="eNumber!=null and eNumber!=''">
+                #{eNumber},
+            </if>
+            <if test="eFactoryDate!=null">
+                #{eFactoryDate},
+            </if>
+            <if test="ePurchaseDate!=null">
+                #{ePurchaseDate},
+            </if>
+            <if test="eFactory!=null and eFactory!=''">
+                #{eFactory},
+            </if>
+            <if test="eUnitPrice!=null and eUnitPrice!=''">
+                #{eUnitPrice},
+            </if>
+            <if test="eStatus!=null and eStatus!='' or eStatus==0">
+                #{eStatus},
+            </if>
+            <if test="eMaintenance!=null and eMaintenance!='' or eMaintenance==0">
+                #{eMaintenance}
+            </if>
+        </trim>
+    </sql>
+    <!--多条件查询-->
+    <sql id="searchEquipC">
+        <where>
+            <if test="sk.eName!=null and sk.eName!=''">
+                and e_name like concat('%',#{sk.eName},'%')
+            </if>
+            <if test="sk.eFactory!=null and sk.eFactory!=''">
+                and e_factory like concat('%',#{sk.eFactory},'%')
+            </if>
+        </where>
+    </sql>
+    <!--更新字段-->
+    <sql id="modifyEquipC">
+        <set>
+            <if test="eName!=null and eName!=''">
+                e_name = #{eName},
+            </if>
+            <if test="eNumber!=null and eNumber!=''">
+                e_number = #{eNumber},
+            </if>
+            <if test="eFactoryDate!=null">
+                e_factory_date = #{eFactoryDate},
+            </if>
+            <if test="ePurchaseDate">
+                e_purchase_date = #{ePurchaseDate},
+            </if>
+            <if test="eFactory!=null and eFactory!=''">
+                e_factory = #{eFactory},
+            </if>
+            <if test="eUnitPrice!=null and eUnitPrice!=''">
+                e_unit_price = #{eUnitPrice},
+            </if>
+            <if test="eStatus!=null and eStatus!=''">
+                e_status = #{eStatus},
+            </if>
+            <if test="eMaintenance!=null and eMaintenance!=''">
+                e_maintenance = #{eMaintenance}
+            </if>
+        </set>
+    </sql>
+
+    <insert id="addEquip" useGeneratedKeys="true">
+        insert into equip
+        <include refid="addEquipC1"></include>
+        values
+        <include refid="addEquipC2"></include>
+    </insert>
+
+    <select id="getEquipInfo" resultMap="EquipMap">
+        select *
+        from equip limit #{page},#{limit}
+    </select>
+
+    <select id="getAllEquipInfo" resultMap="EquipMap">
+        select *
+        from equip
+    </select>
+
+    <select id="searchEquipInfo" resultMap="EquipMap">
+        select * from equip
+        <include refid="searchEquipC"></include>
+        limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllEquipInfo" resultMap="EquipMap">
+        select * from equip
+        <include refid="searchEquipC"></include>
+    </select>
+
+    <select id="equipInfo" resultMap="EquipMap">
+        select *
+        from equip
+        where e_id = #{eId}
+    </select>
+
+    <update id="modifyEquip">
+        update equip <include refid="modifyEquipC"></include> where e_id = #{eId}
+    </update>
+
+    <update id="startRepairEquip">
+        update equip set e_maintenance=1 where e_id = #{eId}
+    </update>
+
+    <update id="stopRepairEquip">
+        update equip set e_maintenance=2 where e_id = #{eId}
+    </update>
+
+    <update id="settleEquipFee">
+        update equip set e_whether_spend = 1 where e_id = #{eId}
+    </update>
+
+    <update id="recycleEquip">
+        update equip set e_status=3 where e_id = #{eId}
+    </update>
+</mapper>

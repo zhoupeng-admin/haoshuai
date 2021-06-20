@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.CustomMapper">
+    <resultMap id="CMap" type="com.haoshuai.app.entity.Custom">
+        <id column="c_id" property="cId"/>
+        <result column="c_name" property="cName"/>
+        <result column="c_nick_name" property="cNickName"/>
+        <result column="c_pwd" property="cPwd"/>
+        <result column="c_phone" property="cPhone"/>
+        <result column="c_email" property="cEmail"/>
+    </resultMap>
+
+    <sql id="addCC1">
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cPhone!=null and cPhone!=''">
+                c_phone,
+            </if>
+            <if test="cPwd!=null and cPwd!=''">
+                c_pwd
+            </if>
+        </trim>
+    </sql>
+    <sql id="addCC2">
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cPhone!=null and cPhone!=''">
+                #{cPhone},
+            </if>
+            <if test="cPwd!=null and cPwd!=''">
+                #{cPwd}
+            </if>
+        </trim>
+    </sql>
+    <sql id="modifyCC">
+        <set>
+            c_nick_name = #{cNickName},c_name = #{cName},c_email = #{cEmail}
+        </set>
+    </sql>
+
+    <select id="getCustomByPhone" resultMap="CMap">
+        select * from custom where c_phone = #{cPhone}
+    </select>
+
+    <select id="getCustomById" resultMap="CMap">
+        select * from custom where c_id = #{cId}
+    </select>
+
+    <insert id="addCustom">
+        insert into custom <include refid="addCC1"></include> value <include refid="addCC2"></include>
+    </insert>
+
+    <select id="login" resultMap="CMap">
+        select * from custom where c_phone = #{cPhone}
+    </select>
+
+    <update id="findPwd">
+        update custom set c_pwd = #{cPwd} where c_phone = #{cPhone}
+    </update>
+
+    <update id="modifyCustom">
+        update custom <include refid="modifyCC"></include> where c_id = #{cId}
+    </update>
+
+    <update id="modifyPwd">
+        update custom set c_pwd = #{cPwd} where c_id = #{cId}
+    </update>
+
+</mapper>

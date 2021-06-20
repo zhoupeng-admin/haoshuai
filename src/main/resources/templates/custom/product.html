@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>产品详情</title>
+    <meta name="keywords" content="DeathGhost"/>
+    <meta name="description" content="DeathGhost"/>
+    <meta name="author" content="DeathGhost,deathghost@deathghost.cn">
+    <link rel="icon" th:href="@{images/icon/favicon.ico}" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" th:href="@{css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/public.css}" media="all">
+    <script src="js/html5.js"></script>
+    <script th:src="@{js/jquery.js}"></script>
+    <script th:src="@{js/swiper.min.js}"></script>
+    <script>
+        $(document).ready(function () {
+            $("nav .indexAsideNav").hide();
+            $("nav .category").mouseover(function () {
+                $(".asideNav").slideDown();
+            });
+            $("nav .asideNav").mouseleave(function () {
+                $(".asideNav").slideUp();
+            });
+            //detail tab
+            $(".product_detail_btm .item_tab a").click(function () {
+                var liindex = $(".product_detail_btm .item_tab a").index(this);
+                $(this).addClass("curr_li").parent().siblings().find("a").removeClass("curr_li");
+                $(".cont_wrap").eq(liindex).fadeIn(150).siblings(".cont_wrap").hide();
+            });
+            //radio
+            $(".horizontal_attr label").click(function () {
+                $(this).addClass("isTrue").siblings().removeClass("isTrue");
+            });
+        });
+    </script>
+</head>
+<body>
+<!--header-->
+<header>
+    <!--topNavBg-->
+    <div class="topNavBg">
+        <div class="wrap">
+            <!--topLeftNav-->
+            <ul class="topLtNav" th:if="${session.isEmpty()}">
+                <li><a href="/app/login" class="obviousText">亲，请登录</a></li>
+                <li th:if="${session.isEmpty()}"><a href="/app/register">注册</a></li>
+            </ul>
+            <ul class="topLtNav" th:if="!${session.isEmpty()}">
+                <li><a class="obviousText" th:text="${session.cInfo.getcPhone()}"></a>
+                </li>
+                <li><a id="exit" class="obviousText">退出登录</a></li>
+            </ul>
+            <!--topRightNav-->
+            <ul class="topRtNav">
+                <li><a href="/app/user">个人中心</a></li>
+                <!--                <li><a href="/app/cart" class="cartIcon">购物车<i>0</i></a></li>-->
+                <li><a href="/app/bs/logins">商家中心</a></li>
+            </ul>
+        </div>
+    </div>
+    <!--logoArea-->
+    <div class="wrap logoSearch">
+        <!--logo-->
+        <div class="logo">
+            <h1><img src="images/logo.png"/></h1>
+        </div>
+        <!--search-->
+
+    </div>
+    <!--nav-->
+    <nav>
+        <ul class="wrap navList">
+            <li>
+                <a href="/app/store">首页</a>
+            </li>
+            <li>
+                <a href="/app/old">老人专区</a>
+            </li>
+            <li>
+                <a href="/app/nc" class="active">母婴专区</a>
+            </li>
+            <li>
+                <a href="/app/hmc">上门服务</a>
+            </li>
+        </ul>
+    </nav>
+
+</header>
+<script>
+    $(document).ready(function () {
+        //测试效果，程序对接如需变动重新编辑
+        $(".switchNav li").click(function () {
+            $(this).addClass("active").siblings().removeClass("active");
+        });
+        $("#chanpin").click(function () {
+            $(".inputWrap input[type='text']").attr("placeholder", "输入产品关键词或货号");
+        });
+        $("#shangjia").click(function () {
+            $(".inputWrap input[type='text']").attr("placeholder", "输入商家店铺名");
+        });
+        $("#zixun").click(function () {
+            $(".inputWrap input[type='text']").attr("placeholder", "输入关键词查找文章内容");
+        });
+        $("#wenku").click(function () {
+            $(".inputWrap input[type='text']").attr("placeholder", "输入关键词查找文库内容");
+        });
+    });
+
+</script>
+
+<!--导航指向-->
+<aside class="wrap insideLink">
+
+</aside>
+<section class="wrap product_detail">
+    <!--img:left-->
+    <!--text:right-->
+    <div class="rt_infor" style="margin-left: 0px;">
+        <!--lt_infor-->
+        <div class="goods_infor">
+            <h2 th:text="${pInfo.getpName()}"></h2>
+            <ul>
+                <li>
+                    <dl class="horizontal">
+                        <dt>价格：</dt>
+                        <dd><strong class="rmb_icon univalent" th:text="${pInfo.getpPrice()}"></strong>/元</dd>
+                    </dl>
+                </li>
+                <li>
+                    <dl class="horizontal horizontal_attr">
+                        <dt>数量：</dt>
+                        <dd>
+                            <input type="button" value="-" class="jj_btn" id="minus"/>
+                            <input type="text" name="num" value="1" readonly class="num"/>
+                            <input type="button" value="+" class="jj_btn" id="add"/>
+                        </dd>
+                    </dl>
+                </li>
+                <li class="last_li">
+                    <input type="button" value="立即购买" class="buy_btn"/>
+                </li>
+            </ul>
+        </div>
+        <!--rt_infor-->
+    </div>
+</section>
+<!--detail-->
+
+<!--footer-->
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script>
+    $("#add").on('click', function () {
+        var n = $("input[name='num']").val();
+        console.log(n);
+        $('.num').val(parseInt(n) + 1);
+    })
+    $("#minus").on('click', function () {
+        var n = $("input[name='num']").val();
+        if (n == 0) {
+            alert('数量不能再少了');
+            return false;
+        }
+        $('.num').val(parseInt(n) - 1);
+    })
+</script>
+<script th:inline="javascript">
+    layui.use(['form'], function () {
+        var layer = layui.layer;
+        $(".buy_btn").on('click', function (data) {
+            var s = [[${cInfo}]];
+            console.log(s);
+            if (s == null) {
+                location.href = '/app/login';
+            } else {
+                $.ajax({
+                    url: '/app/Custom/add_order.do',
+                    type: 'post',
+                    data: {
+                        oPackageId: ([[${pInfo.getpId()}]]),
+                        oStatus: 0,
+                        oPackageNumbers: $("input[name='num']").val(),
+                        oTotalPrice: ($("input[name='num']").val()) * [[${pInfo.getpPrice()}]],
+                        oTime: getTime(),
+                        oPid: [[${session.cInfo.getcId()}]]
+                    },
+                    dataType: 'json',
+                    success: function (res) {
+                        layer.msg(res.msg, {icon: res.code, time: 800}, function () {
+                            location.reload();
+                        })
+                    }
+                })
+            }
+        })
+    })
+
+    function dislodgeLetter(str) {
+        var result;
+        var reg = /[a-zA-Z]+/;  //[a-zA-Z]表示匹配字母，g表示全局匹配
+        while (result = str.match(reg)) { //判断str.match(reg)是否没有字母了
+            str = str.replace(result[0], ''); //替换掉字母  result[0] 是 str.match(reg)匹配到的字母
+        }
+        return str;
+    }
+
+    function getTime() {
+        var date = new Date();
+        Y = date.getFullYear() + '-';
+        M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+        D = date.getDate() + ' ';
+        h = date.getHours() + ':';
+        m = date.getMinutes() + ':';
+        s = date.getSeconds();
+        return Y + M + D + h + m + s;
+    }
+</script>
+</body>
+</html>

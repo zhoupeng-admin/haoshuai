@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.SysUserRoleMapper">
+
+    <resultMap id="SysUserRoleMap" type="com.haoshuai.app.entity.SysUserRole">
+        <id column="s_urid" property="sUrid"/>
+        <result column="s_urname" property="sUrname"/>
+        <result column="s_mid" property="sMid"/>
+    </resultMap>
+
+    <select id="getsMid" resultType="String">
+        select s_mid from CvMCM.sys_user_role where s_urid = #{sSurid}
+    </select>
+</mapper>

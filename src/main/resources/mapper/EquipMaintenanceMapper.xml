@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.EquipMaintenanceMapper">
+    <resultMap id="EMMap" type="com.haoshuai.app.entity.EquipMaintenance">
+        <id column="em_id" property="emId"/>
+        <result column="e_id" property="eId"/>
+        <result column="em_begin_time" property="emBeginTime"/>
+        <result column="em_end_time" property="emEndTime"/>
+        <result column="em_phone" property="emPhone"/>
+        <result column="e_name" property="eName"/>
+        <association property="equip" javaType="com.haoshuai.app.entity.Equip">
+            <result column="e_name" property="eName"/>
+            <result column="e_number" property="eNumber"/>
+            <result column="e_factory_date" property="eFactoryDate"/>
+            <result column="e_purchase_date" property="ePurchaseDate"/>
+            <result column="e_factory" property="eFactory"/>
+            <result column="e_unit_price" property="eUnitPrice"/>
+            <result column="e_status" property="eStatus"/>
+            <result column="e_maintenance" property="eMaintenance"/>
+            <result column="e_whether_spend" property="eWhetherSpend"/>
+        </association>
+    </resultMap>
+
+    <!--插入字段-->
+    <sql id="addEMMC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="eId!=null and eId!=''">
+                e_id,
+            </if>
+            <if test="emBeginTime!=null">
+                em_begin_time,
+            </if>
+            <if test="emPhone!=null and emPhone!=''">
+                em_phone
+            </if>
+        </trim>
+    </sql>
+    <sql id="addEMMC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="eId!=null and eId!=''">
+                #{eId},
+            </if>
+            <if test="emBeginTime!=null">
+                #{emBeginTime},
+            </if>
+            <if test="emPhone!=null and emPhone!=''">
+                #{emPhone}
+            </if>
+        </trim>
+    </sql>
+    <!--添加查询-->
+    <sql id="searchEMC">
+        <where>
+            <if test="sk.eId!=null and sk.eId!=''">
+                and e_id = #{sk.eId}
+            </if>
+            <if test="sk.emId!=null and sk.emId!=''">
+                and em_id = #{sk.emId}
+            </if>
+            <if test="sk.eName!=null and sk.eName!=''">
+                and e_name = #{sk.eName}
+            </if>
+        </where>
+    </sql>
+    
+    <insert id="startRepairEquip">
+        insert into equip_maintenance
+        <include refid="addEMMC1"></include>
+        value 
+        <include refid="addEMMC2"></include>
+    </insert>
+
+    <select id="getEquipMaintenanceInfo" resultMap="EMMap">
+        select * from view_equip_maintenance
+        limit #{page},#{limit}
+    </select>
+
+    <select id="getAllEquipMaintenanceInfo" resultMap="EMMap">
+        select *
+        from view_equip_maintenance
+    </select>
+    
+    <select id="searchEquipMaintenanceInfo" resultMap="EMMap">
+        select * from view_equip_maintenance <include refid="searchEMC"></include> limit #{page},#{limit}
+    </select>
+    
+    <select id="searchAllEquipMaintenanceInfo" resultMap="EMMap">
+        select * from view_equip_maintenance <include refid="searchEMC"></include>
+    </select>
+
+</mapper>

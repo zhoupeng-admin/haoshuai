@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.SectionMapper">
+    <resultMap id="SectionMap" type="com.haoshuai.app.entity.Section">
+        <id column="s_id" property="sId"/>
+        <result column="s_no" property="sNo"/>
+        <result column="s_name" property="sName"/>
+        <result column="s_category" property="sCategory"/>
+    </resultMap>
+
+    <!--添加部门字段1-->
+    <sql id="addSectionC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="sNo!=null and sNo!=''">
+                s_no,
+            </if>
+            <if test="sName!=null and sName!=''">
+                s_name,
+            </if>
+            <if test="sCategory!=null and sCategory!=''">
+                s_category
+            </if>
+        </trim>
+    </sql>
+    <!--添加部门字段2-->
+    <sql id="addSectionC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="sNo!=null and sNo!=''">
+                #{sNo},
+            </if>
+            <if test="sName!=null and sName!=''">
+                #{sName},
+            </if>
+            <if test="sCategory!=null and sCategory!=''">
+                #{sCategory}
+            </if>
+        </trim>
+    </sql>
+    <!--多条件筛选-->
+    <sql id="searchSectionC">
+        <where>
+            <if test="sk.sNo!=null and sk.sNo!=''">
+                and s_no = #{sk.sNo}
+            </if>
+            <if test="sk.sName!=null and sk.sName!=''">
+                and s_name like concat('%',#{sk.sName},'%')
+            </if>
+            <if test="sk.sCategory!=null and sk.sCategory!=''">
+                and s_category like concat('%',#{sk.sCategory},'%')
+            </if>
+        </where>
+    </sql>
+    <!--更新部门信息字段-->
+    <sql id="modifySectionC">
+        <set>
+            <if test="sName!=null and sName!=''">
+                s_name = #{sName},
+            </if>
+            <if test="sCategory!=null and sCategory!=''">
+                s_category = #{sCategory}
+            </if>
+        </set>
+    </sql>
+
+    <select id="sectionInfoByNo" resultMap="SectionMap">
+        select * from
+        section
+        where s_no = #{sNo}
+    </select>
+
+    <select id="checkExistSection" resultMap="SectionMap">
+        select * from
+        section
+        where s_name = #{sName} and s_name != #{sName1}
+    </select>
+
+    <select id="sectionInfo" resultMap="SectionMap">
+        select * from
+        section
+        where s_name = #{sName}
+    </select>
+
+    <insert id="addSection">
+        insert into section
+        <include refid="addSectionC1"></include>
+        values
+        <include refid="addSectionC2"></include>
+    </insert>
+
+    <select id="getSectionInfo" resultMap="SectionMap">
+        select * from section
+        limit #{page},#{limit}
+    </select>
+
+    <select id="getAllSectionInfo" resultMap="SectionMap">
+        select * from section
+    </select>
+
+    <select id="searchSectionInfo" resultMap="SectionMap">
+        select * from section
+        <include refid="searchSectionC"></include>
+        limit #{page},#{limit}
+    </select>
+    
+    <select id="searchAllSectionInfo" resultMap="SectionMap">
+        select * from section 
+        <include refid="searchSectionC"></include>
+    </select>
+
+    <delete id="deleteSection">
+        delete from section
+        where s_no = #{sNo}
+    </delete>
+
+    <update id="modifySection">
+        update section
+        <include refid="modifySectionC"></include>
+        where s_no =  #{sNo}
+    </update>
+
+    <delete id="deleteManysection">
+        delete from section
+        where s_no in
+        <foreach collection="array" item="e" open="(" separator="," close=")">
+            #{e}
+        </foreach>
+    </delete>
+</mapper>

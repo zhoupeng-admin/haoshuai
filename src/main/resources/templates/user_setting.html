@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>基本资料</title>
+    <meta name="renderer" content="webkit">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/public.css}" media="all">
+    <style>
+        .layui-form-item .layui-input-company {
+            width: auto;
+            padding-right: 10px;
+            line-height: 38px;
+        }
+
+        input[readonly]{
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <div class="layui-form layuimini-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="sUname" lay-verify="required" lay-reqtext="管理账号不能为空"
+                           placeholder="请输入管理账号" th:value="${userInfo.getsUname()}" class="layui-input" readonly>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">姓名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="sCname" lay-verify="required" lay-reqtext="姓名不能为空"
+                           placeholder="请输入姓名" th:value="${userInfo.getsCname()}" class="layui-input">
+                    <tip>姓名必填项 </tip>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">手机</label>
+                <div class="layui-input-block">
+                    <input type="text" name="sUphone" lay-verify="sUphone" lay-reqtext="手机不能为空" placeholder="请输入手机"
+                           th:value="${userInfo.getsUphone()}" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">性别</label>
+                <div class="layui-input-block">
+                    <input type="radio" value="0" name="uGender" title="男" th:checked="${userInfo.getsUgender() == 0}">
+                    <input type="radio" value="1" name="uGender" title="女" th:checked="${userInfo.getsUgender() == 1}">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">账号状态</label>
+                <div class="layui-input-block">
+                    <input type="text" th:value="${userInfo.getsUstatus()==0 ? '启用' : '停用'}" class="layui-input" readonly>
+                </div>
+            </div>
+
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">账户类型</label>
+                <div class="layui-input-block">
+                    <input type="text" th:value="${userInfo.getSysUserRole().getSUrname()}" class="layui-input" readonly>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:src="@{/js/lay-config.js?v=1.0.4}" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'miniTab'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            miniTab = layui.miniTab,
+            $ = layui.jquery;
+
+        form.verify({
+            sUphone:function (value,item){
+                if(value.length==0) {
+                    return "手机号长度不能为空!"
+                }
+                if(!(/^1[3-9]{1}[0-9]{9}$/.test(value))) {
+                    return "手机号格式不正确!";
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            var data = data.field;
+            console.log(data);
+            $.ajax({
+                url:'/app/sys/modify_info.do',
+                method:'post',
+                data:{
+                    sUname:data.sUname,
+                    sCname:data.sCname,
+                    sUgender:data.uGender,
+                    sUphone:data.sUphone
+                },
+                dataType:'json',
+                success(res){
+                    if(res.code == 1){
+                        layer.msg(res.msg,{icon:res.code,time:800},function () {
+                            location.reload();
+                        })
+                    }else{
+                        layer.msg(res.msg,{icon:res.code,time:800},function () {
+                            location.reload();
+                        })
+                    }
+                }
+            })
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

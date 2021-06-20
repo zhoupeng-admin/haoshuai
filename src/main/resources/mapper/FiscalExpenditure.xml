@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.FiscalExpenditureMapper">
+    <resultMap id="FEMap" type="com.haoshuai.app.entity.FiscalExpenditure">
+        <id column="fe_id" property="feId"/>
+        <result column="fe_type" property="feType"/>
+        <result column="fe_operator" property="feOperator"/>
+        <result column="fe_operate_time" property="feOperateTime"/>
+        <result column="fe_price" property="fePrice"/>
+        <result column="fe_into_count" property="feIntoCount"/>
+        <result column="fe_out_count" property="feOutCount"/>
+        <result column="fe_remark" property="feRemark"/>
+        <result column="fe_spend_type" property="feSpendType"/>
+    </resultMap>
+    
+    <sql id="addFEC1">
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="feType!=null and feType!='' or feType==0">
+                fe_type,
+            </if>
+            <if test="feOperator!=null and feOperator!=''">
+                fe_operator,
+            </if>
+            <if test="feOperateTime!=null">
+                fe_operate_time,
+            </if>
+            <if test="fePrice!=null and fePrice!=''">
+                fe_price,
+            </if>
+            <if test="feIntoCount!=null and feIntoCount!=''">
+                fe_into_count,
+            </if>
+            <if test="feOutCount!=null and feOutCount!=''">
+                fe_out_count,
+            </if>
+            <if test="feSpendType!=null and feSpendType!='' or feSpendType==0">
+                fe_spend_type,
+            </if>
+            <if test="feRemark!=null and feRemark!=''">
+                fe_remark
+            </if>
+        </trim>
+    </sql>
+    <sql id="addFEC2">
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="feType!=null and feType!='' or feType==0">
+                #{feType},
+            </if>
+            <if test="feOperator!=null and feOperator!=''">
+                #{feOperator},
+            </if>
+            <if test="feOperateTime!=null">
+                #{feOperateTime},
+            </if>
+            <if test="fePrice!=null and fePrice!=''">
+                #{fePrice},
+            </if>
+            <if test="feIntoCount!=null and feIntoCount!=''">
+                #{feIntoCount},
+            </if>
+            <if test="feOutCount!=null and feOutCount!=''">
+                #{feOutCount},
+            </if>
+            <if test="feSpendType!=null and feSpendType!='' or feSpendType==0">
+                #{feSpendType},
+            </if>
+            <if test="feRemark!=null and feRemark!=''">
+                #{feRemark}
+            </if>
+        </trim>
+    </sql>
+
+    <insert id="addFiscalExpenditure">
+        insert into fiscal_expenditure <include refid="addFEC1"></include> values <include refid="addFEC2"></include>
+    </insert>
+
+    <select id="getFEInfo" resultMap="FEMap">
+        select * from fiscal_expenditure limit #{page},#{limit}
+    </select>
+
+    <select id="getAllFEInfo" resultMap="FEMap">
+        select * from fiscal_expenditure
+    </select>
+
+    <select id="searchFEInfo" resultMap="FEMap">
+        select * from fiscal_expenditure where fe_spend_type = #{sk.feSpendType} and fe_id = #{sk.feId} limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllFEInfo" resultMap="FEMap">
+        select * from fiscal_expenditure where fe_spend_type = #{sk.feSpendType} and fe_id = #{sk.feId}
+    </select>
+</mapper>

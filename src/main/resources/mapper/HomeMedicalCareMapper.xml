@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.HomeMedicalCareMapper">
+
+    <resultMap id="HMCMap" type="com.haoshuai.app.entity.HomeMedicalCare">
+        <id column="hmc_id" property="hmcId"/>
+        <result column="hmc_name" property="hmcName"/>
+        <result column="hmc_price" property="hmcPrice"/>
+        <result column="hmc_remark" property="hmcRemark"/>
+    </resultMap>
+
+    <!--插入字段-->
+    <sql id="addHMCC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="hmcName!=null and hmcName!=''">
+                hmc_name,
+            </if>
+            <if test="hmcPrice!=null and hmcPrice!=''">
+                hmc_price,
+            </if>
+            <if test="hmcRemark!=null and hmcRemark!=''">
+                hmc_remark
+            </if>
+        </trim>
+    </sql>
+    <sql id="addHMCC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="hmcName!=null and hmcName!=''">
+                #{hmcName},
+            </if>
+            <if test="hmcPrice!=null and hmcPrice!=''">
+                #{hmcPrice},
+            </if>
+            <if test="hmcRemark!=null and hmcRemark!=''">
+                #{hmcRemark}
+            </if>
+        </trim>
+    </sql>
+    <!--修改信息字段-->
+    <sql id="modifyHMC">
+        <set>
+            <if test="hmcName!=null and hmcName!=''">
+                hmc_name = #{hmcName},
+            </if>
+            <if test="hmcPrice!=null and hmcPrice!=''">
+                hmc_price = #{hmcPrice},
+            </if>
+                hmc_remark = #{hmcRemark}
+        </set>
+    </sql>
+
+    <insert id="addHomeMeicalCare">
+        insert into home_medical_care
+        <include refid="addHMCC1"></include>
+        values
+        <include refid="addHMCC2"></include>
+    </insert>
+
+    <select id="getHomeMedicalCareInfo" resultMap="HMCMap">
+        select *
+        from home_medical_care limit #{page},#{limit}
+    </select>
+
+    <select id="getAllHomeMedicalCareInfo" resultMap="HMCMap">
+        select *
+        from home_medical_care
+    </select>
+
+    <select id="searchHomeMedicalCareInfo" resultMap="HMCMap">
+        select * from home_medical_care
+        <where>
+            <if test="sk.hmcName!=null and sk.hmcName!=''">
+                hmc_name like concat('%',#{sk.hmcName},'%')
+            </if>
+        </where>
+        limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllHomeMedicalCareInfo" resultMap="HMCMap">
+        select * from home_medical_care
+        <where>
+            <if test="sk.hmcName!=null and sk.hmcName!=''">
+                hmc_name like concat('%',#{sk.hmcName},'%')
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteManyHomeMedicalCare">
+        delete from home_medical_care
+        where hmc_id in
+        <foreach collection="array" item="e" open="(" close=")" separator=",">
+            #{e}
+        </foreach>
+    </delete>
+
+    <select id="homeMedicalCareInfoByhmcId" resultMap="HMCMap">
+        select *
+        from home_medical_care
+        where hmc_id = #{hmcId}
+    </select>
+
+    <update id="modifyHomeMedicalCare">
+        update home_medical_care
+        <include refid="modifyHMC"></include>
+        where hmc_id = #{hmcId}
+    </update>
+
+    <delete id="deleteHomeMedicalCare">
+        delete from home_medical_care where hmc_id = #{hmcId}
+    </delete>
+</mapper>

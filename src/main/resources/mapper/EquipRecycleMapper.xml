@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.EquipRecycleMapper">
+    <resultMap id="ERMap" type="com.haoshuai.app.entity.EquipRecycle">
+        <id column="re_id" property="reId"/>
+        <result column="re_name" property="reName"/>
+        <result column="re_phone" property="rePhone"/>
+        <association property="equip" javaType="com.haoshuai.app.entity.Equip">
+            <result column="e_id" property="eId"/>
+            <result column="e_name" property="eName"/>
+            <result column="e_number" property="eNumber"/>
+            <result column="e_factory_date" property="eFactoryDate"/>
+            <result column="e_purchase_date" property="ePurchaseDate"/>
+            <result column="e_factory" property="eFactory"/>
+            <result column="e_unit_price" property="eUnitPrice"/>
+            <result column="e_status" property="eStatus"/>
+            <result column="e_maintenance" property="eMaintenance"/>
+            <result column="e_whether_spend" property="eWhetherSpend"/>
+        </association>
+    </resultMap>
+
+    <sql id="addERC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="eId!=null and eId!=''">
+                e_id,
+            </if>
+            <if test="reName!=null and reName!=''">
+                re_name,
+            </if>
+            <if test="rePhone!=null and rePhone!=''">
+                re_phone
+            </if>
+        </trim>
+    </sql>
+    <sql id="addERC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="eId!=null and eId!=''">
+                #{eId},
+            </if>
+            <if test="reName!=null and reName!=''">
+                #{reName},
+            </if>
+            <if test="rePhone!=null and rePhone!=''">
+                #{rePhone}
+            </if>
+        </trim>
+    </sql>
+    <sql id="searchERC">
+        <where>
+            <if test="sk.eId!=null and sk.eId!=''">
+                and e_id like concat('%',#{sk.eId},'%')
+            </if>
+            <if test="sk.reName!=null and sk.reName!=''">
+                and re_name like concat('%',#{sk.reName},'%')
+            </if>
+            <if test="sk.rePhone!=null and sk.rePhone!=''">
+                and re_phone like concat('%',#{sk.rePhone},'%')
+            </if>
+            <if test="sk.equip.eName!=null and sk.equip.eName!=''">
+                and e_name like concat('%',#{sk.equip.eName},'%')
+            </if>
+        </where>
+    </sql>
+    
+    <insert id="addEquipRecycle">
+        insert into equip_recycle <include refid="addERC1"></include> value <include refid="addERC2"></include>
+    </insert>
+    
+    <select id="getRecycleEquipInfo" resultMap="ERMap">
+        select * from view_recycle_equip limit #{page},#{limit}
+    </select>
+
+    <select id="getAllRecycleEquipInfo" resultMap="ERMap">
+        select * from view_recycle_equip
+    </select>
+
+    <select id="searchRecycleEquipInfo" resultMap="ERMap">
+        select * from view_recycle_equip <include refid="searchERC"></include> limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllRecycleEquipInfo" resultMap="ERMap">
+        select * from view_recycle_equip <include refid="searchERC"></include>
+    </select>
+
+
+</mapper>

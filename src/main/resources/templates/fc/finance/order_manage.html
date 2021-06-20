@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>床位信息管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/public.css}" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="" id="search_form">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <select name="oStatus">
+                                    <option value="0">未付款</option>
+                                    <option value="2">已发货</option>
+                                    <option value="3">已签收</option>
+                                    <option value="4">退货申请</option>
+                                    <option value="6">已退货</option>
+                                    <option value="7">取消交易</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">订单编号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="oNo" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" id="save" class="layui-btn layui-btn-primary" lay-submit=""
+                                    data-type="reload"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            {{# if(d.oStatus==0){ }}
+            未付款
+            {{# }else if(d.oStatus==1){ }}
+            已付款
+            {{# }else if(d.oStatus==2){ }}
+            {{# }else if(d.oStatus==3){ }}
+            已签收
+            {{# }else if(d.oStatus==5){ }}
+            已退货
+            {{# }else if(d.oStatus==6){ }}
+            已退货
+            {{# }else if(d.oStatus==4){ }}
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="confirm_return">同意退货</a>
+            {{# }else{ }}
+            取消交易
+            {{# } }}
+        </script>
+
+    </div>
+</div>
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#currentTableId',
+            url: '/app/fc/get_order_list.do',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [
+                [
+                    {field: 'oNo', align: 'center', width: 200, title: '订单编号',},
+                    {
+                        field: 'p.p', align: 'center', width: 140, title: '产品名', templet: function (data) {
+                            return data.p.pName;
+                        }
+                    },
+                    {
+                        field: 'p.p', align: 'center', width: 80, title: '单价', templet: function (data) {
+                            return '¥' + data.p.pPrice;
+                        }
+                    },
+                    {field: 'oPackageNumbers', align: 'center', width: 80, title: '数量',},
+                    {field: 'oTotalPrice', align: 'center', width: 80, title: '总价',},
+                    {align: 'center', title: '订单操作', toolbar: '#currentTableBar'},
+                ]
+            ],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 15,
+            page: true,
+            // skin: 'line'
+        });
+
+        var active = {
+            reload: function () {
+                var index = layer.load(2);
+                var form_data = $("#search_form").serializeArray();
+                var arr = [];
+                $.each(form_data, function () {
+                    arr[this.name] = this.value;
+                });
+                console.log(arr.bPrice);
+                //执行搜索重载
+                table.reload('currentTableId', {
+                    url: '/app/fc/search_order_list.do',
+                    method: 'post',
+                    page: {
+                        curr: 1
+                    }
+                    , where: {
+                        oStatus: arr.oStatus,
+                        oNo: arr.oNo,
+                        done: function () {
+                            layer.close(index);
+                        }
+                    }
+                });
+            }
+        }
+
+        // 监听搜索操作
+        $('#save').on('click', function () {
+            var type = $(this).data('type');
+            var data = $("#search_form").serializeArray();
+            var flag = 0;
+            console.log(data);
+            $.each(data, function () {
+                if (this.value != '') {
+                    flag++;
+                }
+            });
+            if (flag == 0) {
+                layer.msg('查询内容不能为空');
+                return false;
+            }
+            active[type] ? active[type].call(this) : '';
+        });
+
+        $(document).on('keydown', function (e) {
+            if (e.keyCode == 13) {
+                $("#save").trigger('click');
+                return false;
+            }
+        });
+
+
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            console.log(obj)
+        });
+
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event == 'confirm_return') {
+                $.ajax({
+                    url: '/app/fc/confirm_return.do',
+                    data: {
+                        oId: data.oId,
+                        feType:2,
+                        feOperator:[[${session.usrInfo.getsSurid()}]],
+                        feOperateTime:getTime(),
+                        fePrice:(data.oTotalPrice)/(data.oPackageNumbers),
+                        feOutCount:data.oTradeNo,
+                        feSpendType:0
+                    },
+                    method: 'post',
+                    dataType: 'json',
+                    success(res) {
+                        layer.msg(res.msg, {icon: res.code, time: 800}, function () {
+                            location.reload();
+                        });
+                    }
+                });
+            }
+        });
+        function getTime() {
+            var date = new Date();
+            Y = date.getFullYear() + '-';
+            M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+            D = date.getDate() + ' ';
+            h = date.getHours() + ':';
+            m = date.getMinutes() + ':';
+            s = date.getSeconds();
+            return Y + M + D + h + m + s;
+        }
+    });
+</script>
+
+</body>
+</html>

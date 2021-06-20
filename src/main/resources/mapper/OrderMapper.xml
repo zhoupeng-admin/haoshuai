@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.OrderMapper">
+    <resultMap id="OMap" type="com.haoshuai.app.entity.Order">
+        <id column="o_id" property="oId"/>
+        <result column="o_no" property="oNo"/>
+        <result column="o_package_id" property="oPackageId"/>
+        <result column="o_status" property="oStatus"/>
+        <result column="o_package_numbers" property="oPackageNumbers"/>
+        <result column="o_total_price" property="oTotalPrice"/>
+        <result column="o_time" property="oTime"/>
+        <result column="o_pay_time" property="oPayTime"/>
+        <result column="o_trade_no" property="oTradeNo"/>
+        <result column="o_pid" property="oPid"/>
+        <result column="o_remark" property="oRemark"/>
+        <association property="p" javaType="com.haoshuai.app.entity.Product">
+            <result column="p_id" property="pId"/>
+            <result column="p_name" property="pName"/>
+            <result column="p_price" property="pPrice"/>
+            <result column="p_remark" property="pRemark"/>
+        </association>
+    </resultMap>
+
+    <insert id="addOrder">
+        insert into `order` (o_package_id,o_status,o_package_numbers,o_total_price,o_time,o_pid) value (#{oPackageId},#{oStatus},#{oPackageNumbers},#{oTotalPrice},#{oTime},#{oPid})
+    </insert>
+    
+    <select id="getOrderInfo" resultMap="OMap">
+        select * from view_order limit #{page},#{limit}
+    </select>
+
+    <select id="getAllOrderInfo" resultMap="OMap">
+        select * from view_order
+    </select>
+
+    <select id="searchOrderInfo" resultMap="OMap">
+        select * from view_order where o_status = #{sk.oStatus} and o_no = #{sk.oNo} limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllOrderInfo" resultMap="OMap">
+        select * from view_order where o_status = #{sk.oStatus} and o_no = #{sk.oNo}
+    </select>
+
+    <select id="getOrder" resultMap="OMap">
+        select * from `order` where o_id = #{oId}
+    </select>
+    
+    <update id="payOrder">
+        update `order` set o_status = 2,o_pay_time = #{oPayTime},o_trade_no = #{oTradeNo} where o_id = #{oId}
+    </update>
+
+    <update id="cancelOrder">
+        update `order` set o_status = 7 where o_id = #{oId}
+    </update>
+
+    <update id="returnRequest">
+        update `order` set o_status=4 where o_id = #{oId}
+    </update>
+
+    <update id="confirmRecepit">
+        update `order` set o_status=3 where o_id = #{oId}
+    </update>
+
+    <select id="getOrderInfoById" resultMap="OMap">
+        select * from view_order where o_pid = #{sk.oPid} limit #{page},#{limit}
+    </select>
+
+    <select id="getAllOrderInfoById" resultMap="OMap">
+        select * from view_order where o_pid = #{sk.oPid}
+    </select>
+
+    <select id="searchOrderInfoById" resultMap="OMap">
+        select * from view_order where o_status = #{sk.oStatus} and o_no = #{sk.oNo} and o_pid = #{sk.oPid} limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllOrderInfoById" resultMap="OMap">
+        select * from view_order where o_status = #{sk.oStatus} and o_no = #{sk.oNo} and o_pid = #{sk.oPid}
+    </select>
+
+    <update id="confirmReturn">
+        update `order` set o_status=6 where o_id = #{oId}
+    </update>
+
+</mapper>

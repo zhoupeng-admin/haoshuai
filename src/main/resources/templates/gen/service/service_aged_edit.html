@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>添加设备</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/public.css}" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+         #hmcRemark{
+             margin: 0px 14.5469px 0px 0px;
+             height: 200px;
+             width: 940px;
+             resize: none;
+         }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">养老服务名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="saName" lay-verify="required" placeholder="请输入养老服务名称" class="layui-input" th:value="${saInfo.getSaName()}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">价格</label>
+        <div class="layui-input-block">
+            <input type="number" name="saPrice" lay-verify="saPrice" placeholder="请输入价格" class="layui-input" th:value="${saInfo.getSaPrice()}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">备注</label>
+        <div class="layui-input-block">
+            <textarea id="hmcRemark" name="saRemark" placeholder="" class="layui-input" th:text="${saInfo.getSaRemark()}"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    layui.use(['form','laydate'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery,
+            laydate = layui.laydate;
+
+
+        form.verify({
+            saPrice:function (value,item) {
+                if (value.length == 0) {
+                    return "设备单价不能为空";
+                }
+                if (!(/^[0-9]+(\.[0-9]{0,2})?$/).test(value)) {
+                    return "单价只能为正整数或带有两位小数的正整数"
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            var data = data.field;
+            console.log(data);
+            $.ajax({
+                url: '/app/GenSys/modify_service_aged.do',
+                method: 'post',
+                data: {
+                    saId:[[${saInfo.getSaId()}]],
+                    saId:[[${saInfo.getSaId()}]],
+                    saName:data.saName,
+                    saPrice:data.saPrice,
+                    saRemark:data.saRemark
+                },
+                dataType: 'json',
+                success(res) {
+                    layer.msg(res.msg, {icon: res.code, time: 800}, function () {
+                        parent.location.reload();
+                    });
+                }
+            })
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>设备编辑</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/public.css}" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="layui-form layuimini-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">设备名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="eName" lay-verify="required" placeholder="请输入设备名称" class="layui-input" th:value="${eInfo.geteName()}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">设备数量</label>
+            <div class="layui-input-block">
+                <input type="number" th:value="${eInfo.geteNumber()}" name="eNumber" lay-verify="eNumber" placeholder="请输入设备数量" class="layui-input">
+                <tip>设备数量默认为1,请根据实际情况进行修改</tip>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">出厂日期</label>
+            <div class="layui-input-block">
+                <input type="date" name="eFactoryDate" id="date1" lay-verify="required" placeholder="请选择设备出厂日期" th:value="${eInfo.geteFactoryDate()}" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">购买日期</label>
+            <div class="layui-input-block">
+                <input type="date" name="ePurchaseDate" id="date2" lay-verify="required" placeholder="请选择设备购买日期" th:value="${eInfo.getePurchaseDate()}" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">设备厂商</label>
+            <div class="layui-input-block">
+                <input type="text" name="eFactory" lay-verify="required" placeholder="请输入设备厂商" th:value="${eInfo.geteFactory()}" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">设备单价</label>
+            <div class="layui-input-block">
+                <input type="number" name="eUnitPrice" lay-verify="eUnitPrice" placeholder="请输入设备单价" th:value="${eInfo.geteUnitPrice()}" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">设备使用状态</label>
+            <div class="layui-input-block">
+                <input type="radio" name="eStatus" value="0" title="未使用" th:checked="${eInfo.geteStatus()} == 0">
+                <input type="radio" name="eStatus" value="1" title="使用中" th:checked="${eInfo.geteStatus()} == 1">
+                <input type="radio" name="eStatus" value="2" title="已废弃" th:checked="${eInfo.geteStatus()} == 2">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">设备维修状态</label>
+            <div class="layui-input-block">
+                <input type="radio" name="eMaintenance" value="0" title="未开始" th:checked="${eInfo.geteMaintenance()} == 0">
+                <input type="radio" name="eMaintenance" value="1" title="进行中" th:checked="${eInfo.geteMaintenance()} == 1">
+                <input type="radio" name="eMaintenance" value="2" title="已结束" th:checked="${eInfo.geteMaintenance()} == 2">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+            </div>
+        </div>
+    </div>
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    layui.use(['form','laydate'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery,
+            laydate = layui.laydate;
+
+        // 时间选择器初始化 开始时间
+        laydate.render({
+            elem: '#date1',
+            format: 'yyyy-MM-dd',
+            done: function (value, date, endDate) {
+                var startDate = new Date(value).getTime();
+                var endTime = new Date($('#date2').val()).getTime();
+                if (endTime < startDate) {
+                    layer.msg('结束时间不能小于开始时间');
+                    $('#date1').val($('#date2').val());
+                }
+            }
+        })
+        laydate.render({ //结束时间
+            elem: '#date2',
+            format: 'yyyy-MM-dd',
+            done: function (value, date, endDate) {
+                var startDate = new Date($('#date1').val()).getTime();
+                var endTime = new Date(value).getTime();
+                if (endTime < startDate) {
+                    layer.msg('结束时间不能小于开始时间');
+                    $('#date2').val($('#date1').val());
+                }
+            }
+        });
+
+        form.verify({
+            eUnitPrice:function (value,item) {
+                if (value.length == 0) {
+                    return "设备单价不能为空";
+                }
+                if (!(/^[0-9]+(\.[0-9]{0,2})?$/).test(value)) {
+                    return "单价只能为正整数或带有两位小数的正整数"
+                }
+            },
+            eNumber:function (value, item) {
+                if(value.length == 0){
+                    return "设备数量不能为空";
+                }
+                if(!(/^[1-9]*$/).test(value)){
+                    return "设备数量必须是大于0的整数";
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            var data = data.field;
+            $.ajax({
+                url: '/app/GenSys/modify_equip.do',
+                method: 'post',
+                data: {
+                    eId:[[${eInfo.geteId()}]],
+                    eName:data.eName,
+                    eNumber:data.eNumber,
+                    eFactoryDate:data.eFactoryDate,
+                    ePurchaseDate:data.ePurchaseDate,
+                    eFactory:data.eFactory,
+                    eUnitPrice:data.eUnitPrice,
+                    eStatus:data.eStatus,
+                    eMaintenance:data.eMaintenance
+                },
+                dataType: 'json',
+                success(res) {
+                    layer.msg(res.msg, {icon: res.code, time: 800}, function () {
+                        parent.location.reload();
+                    });
+                }
+            })
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

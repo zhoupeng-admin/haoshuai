@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.SysMenuMapper">
+    <resultMap id="SysMenuMap" type="com.haoshuai.app.entity.SystemMenu">
+        <result column="id" property="id"/>
+        <result column="pid" property="pid"/>
+        <result column="title" property="title"/>
+        <result column="icon" property="icon"/>
+        <result column="href" property="href"/>
+        <result column="target" property="target"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <select id="getSystemMenuByStatusAndSort" resultMap="SysMenuMap">
+        select * from CvMCM.system_menu where status = 1
+<!--        and id in-->
+<!--        <foreach collection="array" item="mid" separator="," open="(" close=")">-->
+<!--            #{mid}-->
+<!--        </foreach>-->
+<!--        and pid in-->
+<!--        <foreach collection="array" item="mid" separator="," open="(" close=")">-->
+<!--            #{mid}-->
+<!--        </foreach>-->
+        order by sort;
+    </select>
+</mapper>

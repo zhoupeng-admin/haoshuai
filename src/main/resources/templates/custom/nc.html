@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>首页</title>
+    <meta name="keywords" content="DeathGhost"/>
+    <meta name="description" content="DeathGhost"/>
+    <meta name="author" content="DeathGhost,deathghost@deathghost.cn">
+    <link rel="icon" th:href="@{images/icon/favicon.ico}" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" th:href="@{css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/public.css}" media="all">
+    <script src="js/html5.js"></script>
+    <script th:src="@{js/jquery.js}"></script>
+    <script th:src="@{js/swiper.min.js}"></script>
+    <script>
+        $(document).ready(function () {
+            $("nav .indexAsideNav").hide();
+            $("nav .category").mouseover(function () {
+                $(".asideNav").slideDown();
+            });
+            $("nav .asideNav").mouseleave(function () {
+                $(".asideNav").slideUp();
+            });
+            //冒泡
+            $(".favorite_list li a").click(function () {
+                alert("链接");
+                window.location.href = 'product.html';
+            });
+            $(".favorite_list li .shop_collect_goods").click(function () {
+                alert("收藏产品");
+                event.stopPropagation();
+            });
+        });
+    </script>
+</head>
+<body>
+<!--advertisment<div class="wrap"><img src="upload/banner.jpg"/></div>-->
+<!--header-->
+<header>
+    <!--topNavBg-->
+    <div class="topNavBg">
+        <div class="wrap">
+            <!--topLeftNav-->
+            <ul class="topLtNav" th:if="${session.isEmpty()}">
+                <li><a href="/app/login" class="obviousText">亲，请登录</a></li>
+                <li th:if="${session.isEmpty()}"><a href="/app/register">注册</a></li>
+            </ul>
+            <ul class="topLtNav" th:if="!${session.isEmpty()}">
+                <li><a class="obviousText" th:text="${session.cInfo.getcPhone()}"></a>
+                </li>
+                <li><a id="exit" class="obviousText">退出登录</a></li>
+            </ul>
+            <!--topRightNav-->
+            <ul class="topRtNav">
+                <li><a href="/app/user">个人中心</a></li>
+<!--                <li><a href="/app/cart" class="cartIcon">购物车<i>0</i></a></li>-->
+<!--                <li><a href="/app/favorite" class="favorIcon">收藏夹</a></li>-->
+                <li><a href="/app/bs/logins">商家中心</a></li>
+            </ul>
+        </div>
+    </div>
+    <!--logoArea-->
+    <div class="wrap logoSearch">
+        <!--logo-->
+        <div class="logo">
+            <h1><img src="images/logo.png"/></h1>
+        </div>
+        <!--search-->
+<!--        <div class="search">-->
+<!--            <ul class="switchNav">-->
+<!--                <li class="active" id="chanpin">产品</li>-->
+<!--            </ul>-->
+<!--            <div class="searchBox">-->
+<!--                <form>-->
+<!--                    <div class="inputWrap">-->
+<!--                        <input type="text" name="pName" placeholder="输入产品关键词或货号"/>-->
+<!--                    </div>-->
+<!--                    <div class="btnWrap">-->
+<!--                        <input type="submit" value="搜索" id="search"/>-->
+<!--                    </div>-->
+<!--                </form>-->
+<!--            </div>-->
+<!--        </div>-->
+    </div>
+    <!--nav-->
+    <nav>
+        <ul class="wrap navList">
+            <li>
+                <a href="/app/store">首页</a>
+            </li>
+            <li>
+                <a href="/app/old">老人专区</a>
+            </li>
+            <li>
+                <a href="/app/nc" class="active">母婴专区</a>
+            </li>
+            <li>
+                <a href="/app/hmc">上门服务</a>
+            </li>
+        </ul>
+    </nav>
+
+</header>
+
+<!--advertisment area-->
+<section class="wrap shop_goods_li">
+    <h2>店铺产品</h2>
+    <ul class="favorite_list" id="tbs">
+
+    </ul>
+
+    <!--分页-->
+    <div class="paging" id="demo">
+<!--        <a th:text="${}">第一页</a>-->
+<!--        <a class="active">2</a>-->
+<!--        <a>3</a>-->
+<!--        <a>...</a>-->
+<!--        <a>89</a>-->
+<!--        <a>最后一页</a>-->
+    </div>
+</section>
+
+<!--section:two->articleList-->
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<!--footer-->
+<script>
+    $(function () {
+        fenye();
+    });
+
+    function fenye() {
+        layui.use(['laypage','layer'],function () {
+            var laypage = layui.laypage,
+                layer = layui.layer;
+
+            $.ajax({
+                url:'/app/get_sa.do',
+                type:'get',
+                dataType:'json',
+                data:{
+                    page:1,
+                    limit:15
+                },
+                success:function (data) {
+                    showData(data);
+                    laypage.render({
+                        elem:'demo',
+                        theme:'FFB800',
+                        count:data.count,
+                        layout:['prev','page','next'],
+                        jump:function (obj) {
+                            $.ajax({
+                                url:'/app/get_nc.do',
+                                type:'post',
+                                dataType:'json',
+                                data:{
+                                    page:obj.page,
+                                    limit:obj.limit
+                                },
+                                success:function (data) {
+                                    showData(data);
+                                }
+                            })
+                        }
+                    });
+                }
+            })
+        });
+    }
+
+    function fenye1() {
+        layui.use(['laypage','layer'],function () {
+            var laypage = layui.laypage,
+                layer = layui.layer;
+
+            $.ajax({
+                url:'/app/search_product.do',
+                type:'get',
+                dataType:'json',
+                data:{
+                    page:1,
+                    limit:15,
+                    pName:$("input[name='pName']").val()
+                },
+                success:function (data) {
+                    showData(data);
+                    laypage.render({
+                        elem:'demo',
+                        theme:'FFB800',
+                        count:data.count,
+                        layout:['prev','page','next'],
+                        jump:function (obj) {
+                            $.ajax({
+                                url:'/app/search_product.do',
+                                type:'post',
+                                dataType:'json',
+                                data:{
+                                    page:obj.page,
+                                    limit:obj.limit,
+                                    pName:$("input[name='pName']").val()
+                                },
+                                success:function (data) {
+                                    showData(data);
+                                }
+                            })
+                        }
+                    });
+                }
+            })
+        });
+    }
+
+    function showData(ds) {
+        $("#tbs").empty();
+        var htmlStr="";
+        for(var i=0; i<ds.data.length; i++){
+            htmlStr+='<li><a href="/app/product?pId='+ds.data[i].pId+'">';
+            htmlStr+='<img src="upload/goods005.jpg"/><h3>';
+            htmlStr+=ds.data[i].pName;
+            htmlStr+='</h3><p class="price"><span class="rmb_icon">';
+            htmlStr+=ds.data[i].pPrice;
+            htmlStr+='</span></p>';
+            htmlStr+='<p class="shop_collect_goods" title="收藏该产品"><span>&#115;</span></p>';
+            htmlStr+='</li></a>';
+        }
+        $("#tbs").append(htmlStr);
+    }
+
+    $("#exit").on('click', function (data) {
+        location.href="/app/exit";
+    });
+
+    $("#search").on('click',function (data) {
+        fenye1();
+
+    })
+</script>
+</body>
+</html>

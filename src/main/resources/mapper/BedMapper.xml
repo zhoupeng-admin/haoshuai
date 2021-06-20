@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.BedMapper">
+    <resultMap id="BedMap" type="com.haoshuai.app.entity.Bed">
+        <id column="b_id" property="bId"/>
+        <result column="b_type" property="bType"/>
+        <result column="b_price" property="bPrice"/>
+    </resultMap>
+
+    <!--插入床位类别字段1-->
+    <sql id="addBedTypeC1">
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bType!=null and bType!=''">
+                b_type,
+            </if>
+            <if test="bPrice!=null and bPrice!=''">
+                b_price
+            </if>
+        </trim>
+    </sql>
+    <!--插入床位类别字段2-->
+    <sql id="addBedTypeC2">
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bType!=null and bType!=''">
+                #{bType},
+            </if>
+            <if test="bPrice!=null and bPrice!=''">
+                #{bPrice}
+            </if>
+        </trim>
+    </sql>
+    <!--多条件查询字段-->
+    <sql id="searchBedTypeC">
+        <where>
+            <if test="sk.bType!=null and sk.bType!=''">
+                and b_type like concat('%',#{sk.bType},'%')
+            </if>
+            <if test="sk.bPrice!=null and sk.bPrice!=''">
+                and b_price = #{sk.bPrice}
+            </if>
+        </where>
+    </sql>
+    <!--更新字段-->
+    <sql id="modifyBedInfoC">
+        <set>
+            <if test="bType!=null and bType!=''">
+                b_type = #{bType},
+            </if>
+            <if test="bPrice!=null and bPrice!=''">
+                b_price = #{bPrice}
+            </if>
+        </set>
+    </sql>
+
+    <select id="bedInfo" resultMap="BedMap">
+        select *
+        from bed
+        where b_type = #{bType}
+    </select>
+
+    <select id="getBedInfo" resultMap="BedMap">
+        select *
+        from bed
+        limit #{page},#{limit}
+    </select>
+
+    <select id="getAllBedInfo" resultMap="BedMap">
+        select *
+        from bed
+    </select>
+
+    <insert id="addBed">
+        insert into
+        bed
+        <include refid="addBedTypeC1"></include>
+        values
+        <include refid="addBedTypeC2"></include>
+    </insert>
+
+    <select id="searchBedInfo" resultMap="BedMap">
+        select * from
+        bed
+        <include refid="searchBedTypeC"></include>
+        limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllBedInfo" resultMap="BedMap">
+        select * from
+        bed
+        <include refid="searchBedTypeC"></include>
+    </select>
+
+    <delete id="deleteBed">
+        delete from
+        bed
+        where
+        b_type = #{bType}
+    </delete>
+
+    <delete id="deleteManyBed">
+        delete
+        from bed
+        where b_type in
+        <foreach collection="array" item="e" open="(" separator="," close=")">
+            #{e}
+        </foreach>
+    </delete>
+
+    <update id="modifyBed">
+        update bed
+        <include refid="modifyBedInfoC"></include>
+        where b_id = #{bId}
+    </update>
+
+    <select id="checIsExistBed" resultMap="BedMap">
+        select *
+        from bed
+        where b_type = #{bType}
+        and b_type != #{bType1}
+    </select>
+
+    <select id="bedInfoById" resultMap="BedMap">
+        select *
+        from bed
+        where b_id = #{bId}
+    </select>
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.CartMapper">
+    <resultMap id="CMap" type="com.haoshuai.app.entity.Cart">
+        <result column="c_id" property="cId"/>
+        <result column="o_id" property="oId"/>
+        <result column="o_no" property="oNo"/>
+        <result column="o_package_id" property="oPackageId"/>
+        <result column="o_status" property="oStatus"/>
+        <result column="o_package_numbers" property="oPackageNumbers"/>
+        <result column="o_total_price" property="oTotalPrice"/>
+        <result column="o_time" property="oTime"/>
+        <result column="o_pay_time" property="oPayTime"/>
+        <result column="o_trade_no" property="oTradeNo"/>
+        <result column="o_pid" property="oPid"/>
+        <result column="o_remark" property="oRemark"/>
+    </resultMap>
+</mapper>

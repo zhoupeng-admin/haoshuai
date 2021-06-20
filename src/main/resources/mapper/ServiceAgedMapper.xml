@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.ServiceAgedMapper">
+    <resultMap id="SAMap" type="com.haoshuai.app.entity.ServiceAged">
+        <id column="sa_id" property="saId"/>
+        <result column="sa_name" property="saName"/>
+        <result column="sa_price" property="saPrice"/>
+        <result column="sa_remark" property="saRemark"/>
+    </resultMap>
+
+    <sql id="addSAC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="saName!=null and saName!=''">
+                sa_name,
+            </if>
+            <if test="saPrice!=null and saPrice!=''">
+                sa_price,
+            </if>
+            <if test="saRemark!=null and saRemark!=''">
+                sa_remark
+            </if>
+        </trim>
+    </sql>
+    <sql id="addSAC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="saName!=null and saName!=''">
+                #{saName},
+            </if>
+            <if test="saPrice!=null and saPrice!=''">
+                #{saPrice},
+            </if>
+            <if test="saRemark!=null and saRemark!=''">
+                #{saRemark}
+            </if>
+        </trim>
+    </sql>
+    <sql id="modifySAC">
+        <set>
+            <if test="saName!=null and saName!=''">
+                sa_name = #{saName},
+            </if>
+            <if test="saPrice!=null and saPrice!=''">
+                sa_price = #{saPrice},
+            </if>
+            sa_remark = #{saRemark}
+        </set>
+    </sql>
+
+    <insert id="addServiceAged">
+        insert into service_aged <include refid="addSAC1"></include> value
+        <include refid="addSAC2"></include>
+    </insert>
+
+    <select id="getServiceAgedInfo" resultMap="SAMap">
+        select *
+        from service_aged limit #{page},#{limit}
+    </select>
+
+    <select id="getAllServiceAgedInfo" resultMap="SAMap">
+        select *
+        from service_aged
+    </select>
+
+    <select id="searchServiceAgedInfo" resultMap="SAMap">
+        select *
+        from service_aged
+        where sa_name like concat('%', #{sk.saName}, '%') limit #{page}
+            , #{limit}
+    </select>
+
+    <select id="searchAllServiceAgedInfo" resultMap="SAMap">
+        select *
+        from service_aged
+        where sa_name like concat('%', #{sk.saName}, '%')
+    </select>
+
+    <select id="getServiceAgedInfoBysaId" resultMap="SAMap">
+        select *
+        from service_aged
+        where sa_id = #{saId}
+    </select>
+
+    <update id="modifyServiceAgedInfo">
+        update service_aged <include refid="modifySAC"></include> where sa_id = #{saId}
+    </update>
+
+    <delete id="deleteManyServiceAged">
+        delete from service_aged where sa_id in
+        <foreach collection="array" item="e" open="(" separator="," close=")">
+            #{e}
+        </foreach>
+    </delete>
+
+    <delete id="deleteServiceAged">
+        delete
+        from service_aged
+        where sa_id = #{saId}
+    </delete>
+</mapper>

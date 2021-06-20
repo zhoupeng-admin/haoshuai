@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.DependentsMapper">
+    <resultMap id="DependentsMap" type="com.haoshuai.app.entity.Dependents">
+        <id column="d_id" property="dId"/>
+        <result column="d_name" property="dName"/>
+        <result column="d_gender" property="dGender"/>
+        <result column="d_phone" property="dPhone"/>
+        <result column="p_id" property="pId"/>
+        <result column="p_name" property="pName"/>
+    </resultMap>
+
+    <!--插入字段-->
+    <sql id="addDependentC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="dName!=null and dName!=''">
+                d_name,
+            </if>
+            <if test="dGender!=null and dGender!='' or dGender==0">
+                d_gender,
+            </if>
+            <if test="dPhone!=null and dPhone!=''">
+                d_phone,
+            </if>
+            <if test="pId!=null and pId!=''">
+                p_id
+            </if>
+        </trim>
+    </sql>
+    <sql id="addDependentC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="dName!=null and dName!=''">
+                #{dName},
+            </if>
+            <if test="dGender!=null and dGender!='' or dGender==0">
+                #{dGender},
+            </if>
+            <if test="dPhone!=null and dPhone!=''">
+                #{dPhone},
+            </if>
+            <if test="pId!=null and pId!=''">
+                #{pId}
+            </if>
+        </trim>
+    </sql>
+    <!--多条件查询-->
+    <sql id="searchDependentC">
+        <where>
+            <if test="sk.dName!=null and sk.dName!=''">
+                and d_name = #{sk.dName}
+            </if>
+            <if test="sk.pName!=null and sk.pName!=''">
+                and p_name = #{sk.pName}
+            </if>
+        </where>
+    </sql>
+    <!--编辑信息-->
+    <sql id="modifyDependentC">
+        <set>
+            <if test="pId!=null and pId!=''">
+                p_id = #{pId},
+            </if>
+            <if test="dName!=null and dName!=''">
+                d_name = #{dName},
+            </if>
+            <if test="dGender!=null and dGender!='' or dGender==0">
+                d_gender = #{dGender},
+            </if>
+            <if test="dPhone!=null and dPhone!=''">
+                d_phone = #{dPhone}
+            </if>
+        </set>
+    </sql>
+
+    <insert id="addDependent">
+        insert into dependents
+        <include refid="addDependentC1"></include>
+        values
+        <include refid="addDependentC2"></include>
+    </insert>
+
+    <delete id="deleteManyPatientDependent">
+        delete from dependents where p_id in
+        <foreach collection="array" item="e" open="(" separator="," close=")">
+            #{e}
+        </foreach>
+    </delete>
+
+    <delete id="deletePatientDependent">
+        delete
+        from dependents
+        where p_id = #{pId}
+    </delete>
+
+    <select id="getDependentInfo" resultMap="DependentsMap">
+        select *
+        from view_dependent limit #{page},#{limit}
+    </select>
+
+    <select id="getAllDependentInfo" resultMap="DependentsMap">
+        select *
+        from view_dependent
+    </select>
+
+    <select id="searchDependentInfo" resultMap="DependentsMap">
+        select * from view_dependent
+        <include refid="searchDependentC"></include>
+        limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllDependentInfo" resultMap="DependentsMap">
+        select * from view_dependent
+        <include refid="searchDependentC"></include>
+    </select>
+
+    <delete id="deleteManydependent">
+        delete from dependents where d_id in
+        <foreach collection="array" item="e" open="(" separator="," close=")">
+            #{e}
+        </foreach>
+    </delete>
+
+    <select id="dependentInfo" resultMap="DependentsMap">
+        select *
+        from dependents
+        where d_id = #{dId}
+    </select>
+
+    <update id="modifyDependent">
+        update dependents
+        <include refid="modifyDependentC"></include>
+        where d_id = #{dId}
+    </update>
+
+    <delete id="deleteDependent">
+        delete from dependents
+        where d_id = #{dId}
+    </delete>
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.CustomAddressMapper">
+    <resultMap id="CAMap" type="com.haoshuai.app.entity.CustomAddress">
+        <id column="ca_id" property="caId"/>
+        <result column="ca_name" property="caName"/>
+        <result column="ca_phone" property="caPhone"/>
+        <result column="ca_address" property="caAddress"/>
+        <result column="c_id" property="cId"/>
+    </resultMap>
+
+    <sql id="addCAC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="caName!=null and caName!=''">
+                ca_name,
+            </if>
+            <if test="caPhone!=null and caPhone!=''">
+                ca_phone,
+            </if>
+            <if test="caAddress!=null and caAddress!=''">
+                ca_address,
+            </if>
+            <if test="cId!=null and cId!=''">
+                c_id
+            </if>
+        </trim>
+    </sql>
+    <sql id="addCAC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="caName!=null and caName!=''">
+                #{caName},
+            </if>
+            <if test="caPhone!=null and caPhone!=''">
+                #{caPhone},
+            </if>
+            <if test="caAddress!=null and caAddress!=''">
+                #{caAddress},
+            </if>
+            <if test="cId!=null and cId!=''">
+                #{cId}
+            </if>
+        </trim>
+    </sql>
+    <sql id="modifyCAC">
+        <set>
+            <if test="caName!=null and caName!=''">
+                ca_name = #{caName},
+            </if>
+            <if test="caPhone!=null and caPhone!=''">
+                ca_phone = #{caPhone},
+            </if>
+            <if test="caAddress!=null and caAddress!=''">
+                ca_address = #{caAddress}
+            </if>
+        </set>
+    </sql>
+
+    <insert id="addAddress">
+        insert into custom_address <include refid="addCAC1"></include> value
+        <include refid="addCAC2"></include>
+    </insert>
+
+    <select id="getAllAddress" resultMap="CAMap">
+        select *
+        from custom_address
+        where c_id = #{cId}
+    </select>
+
+    <select id="getAddressInfo" resultMap="CAMap">
+        select *
+        from custom_address
+        where ca_id = #{caId}
+    </select>
+
+    <update id="modifyAddress">
+        update custom_address <include refid="modifyCAC"></include> where ca_id = #{caId}
+    </update>
+
+    <delete id="deleteAddress">
+        delete from custom_address where ca_id = #{caId}
+    </delete>
+</mapper>

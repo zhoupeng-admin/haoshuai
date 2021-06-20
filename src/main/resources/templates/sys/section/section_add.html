@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>添加床位类别</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/public.css}" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">部门编号</label>
+        <div class="layui-input-block">
+            <input type="text" name="sNo" lay-verify="required" lay-reqtext="部门编号不能为空" placeholder="部门编号不能为空"
+                   class="layui-input">
+            <tip>部门编号唯一,一旦确定,无法修改。</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">部门信息</label>
+        <div class="layui-input-block">
+            <input type="text" name="sName" lay-verify="required" lay-reqtext="部门信息不能为空" placeholder="部门信息不能为空" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">部门类别</label>
+        <div class="layui-input-block">
+            <input type="text" name="sCategory" lay-verify="required" lay-reqtext="部门类别不能为空" placeholder="部门类别不能为空" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            var data = data.field;
+            $.ajax({
+                url:'/app/sys/add_section.do',
+                method:'post',
+                data:{
+                    sNo:data.sNo,
+                    sName:data.sName,
+                    sCategory:data.sCategory
+                },
+                dataType:'json',
+                success(res){
+                    layer.msg(res.msg,{icon:res.code,time:800},function () {
+                        parent.location.reload();
+                    });
+                }
+            })
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.NurseMapper">
+    <resultMap id="NurseMap" type="com.haoshuai.app.entity.Nurse">
+        <id column="n_id" property="nId"/>
+        <result column="n_no" property="nNo"/>
+        <result column="n_name" property="nName"/>
+        <result column="n_gender" property="nGender"/>
+        <result column="n_phone" property="nPhone"/>
+        <result column="n_wstatus" property="nWstatus"/>
+    </resultMap>
+
+    <!--添加护工信息字段1-->
+    <sql id="addNurseC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="nNo!=null and nNo!=''">
+                n_no,
+            </if>
+            <if test="nName!=null and nName!=''">
+                n_name,
+            </if>
+            <if test="nGender!=null and nGender!='' or nGender==0">
+                n_gender,
+            </if>
+            <if test="nPhone!=null and nPhone!=''">
+                n_phone,
+            </if>
+            <if test="nWstatus!=null and nWstatus!='' or nWstatus==0">
+                n_wstatus
+            </if>
+        </trim>
+    </sql>
+    <!--添加护工信息字段2-->
+    <sql id="addNurseC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="nNo!=null and nNo!=''">
+                #{nNo},
+            </if>
+            <if test="nName!=null and nName!=''">
+                #{nName},
+            </if>
+            <if test="nGender!=null and nGender!='' or nGender==0">
+                #{nGender},
+            </if>
+            <if test="nPhone!=null and nPhone!=''">
+                #{nPhone},
+            </if>
+            <if test="nWstatus!=null and nWstatus!='' or nWstatus==0">
+                #{nWstatus}
+            </if>
+        </trim>
+    </sql>
+    <!--多条件查询-->
+    <sql id="searchNurseC">
+        <where>
+            <if test="sk.nNo!=null and sk.nNo!=''">
+                and n_no = #{sk.nNo}
+            </if>
+            <if test="sk.nName!=null and sk.nName!=''">
+                and n_name = #{sk.nName}
+            </if>
+        </where>
+    </sql>
+    <!--更新护工信息-->
+    <sql id="modifyNurseC">
+        <set>
+            <if test="nName!=null and nName!=''">
+                n_name = #{nName},
+            </if>
+            <if test="nGender!=null and nGender!=''">
+                n_gender = #{nGender},
+            </if>
+            <if test="nPhone!=null and nPhone!=''">
+                n_phone = #{nPhone},
+            </if>
+            <if test="nWstatus!=null and nWstatus!=''">
+                n_wstatus = #{nWstatus}
+            </if>
+        </set>
+    </sql>
+
+    <select id="nurseInfoBynNo" resultMap="NurseMap">
+        select * from
+        nurse
+        where n_no = #{nNo}
+    </select>
+
+    <insert id="addNurse">
+        insert into nurse
+        <include refid="addNurseC1"></include>
+        values
+        <include refid="addNurseC2"></include>
+    </insert>
+
+    <select id="getNurseInfo" resultMap="NurseMap">
+        select * from nurse limit #{page},#{limit}
+    </select>
+
+    <select id="getAllNurseInfo" resultMap="NurseMap">
+        select * from nurse
+    </select>
+    
+    <select id="searchNurseInfo" resultMap="NurseMap">
+        select * from nurse
+        <include refid="searchNurseC"></include>
+        limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllNurseInfo" resultMap="NurseMap">
+        select * from nurse
+        <include refid="searchNurseC"></include>
+    </select>
+
+    <delete id="deleteManynurse">
+        delete from nurse
+        where n_no in
+        <foreach collection="array" item="e" open="(" separator="," close=")">
+            #{e}
+        </foreach>
+    </delete>
+
+    <update id="modifyNurse">
+        update nurse
+        <include refid="modifyNurseC"></include>
+        where n_no = #{nNo}
+    </update>
+
+    <delete id="deleteNurse">
+        delete from nurse
+        where n_no = #{nNo}
+    </delete>
+</mapper>

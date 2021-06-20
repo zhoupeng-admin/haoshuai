@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.PatientMapper">
+    <resultMap id="PatientMap" type="com.haoshuai.app.entity.Patient">
+        <id column="p_id" property="pId"/>
+        <result column="p_name" property="pName"/>
+        <result column="p_gender" property="pGender"/>
+        <result column="p_phone" property="pPhone"/>
+        <result column="p_birth" property="pBirth"/>
+        <result column="p_mariage" property="pMariage"/>
+        <result column="p_home" property="pHome"/>
+        <result column="p_day_physican" property="pDayPhysican"/>
+        <result column="p_health_exam_time" property="pHealthExamTime"/>
+        <result column="d_name" property="dName"/>
+        <result column="p_ic" property="pIc"/>
+        <association property="familyPastHistory" javaType="com.haoshuai.app.entity.FamilyPastHistory">
+            <result column="p_family_history" property="pFamilyHistory"/>
+            <result column="p_past_medical_history" property="pPastMedicalHistory"/>
+            <result column="p_allergic_history" property="pAllergicHistory"/>
+        </association>
+        <collection property="dependents" javaType="java.util.ArrayList" ofType="com.haoshuai.app.entity.Dependents">
+            <id column="d_id" property="dId"/>
+            <result column="d_name" property="dName"/>
+            <result column="d_gender" property="dGender"/>
+            <result column="d_phone" property="dPhone"/>
+        </collection>
+    </resultMap>
+
+    <!--插入患者信息字段-->
+    <sql id="addPatientC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="pName!=null and pName!=''">
+                p_name,
+            </if>
+            <if test="pGender!=null and pGender!='' or pGender==0">
+                p_gender,
+            </if>
+            <if test="pPhone!=null and pPhone!=''">
+                p_phone,
+            </if>
+            <if test="pBirth!=null">
+                p_birth,
+            </if>
+            <if test="pMariage!=null and pMariage!='' or pMariage==0">
+                p_mariage,
+            </if>
+            <if test="pHome!=null and pHome!=''">
+                p_home,
+            </if>
+            <if test="pDayPhysican!=null and pDayPhysican!=''">
+                p_day_physican,
+            </if>
+            <if test="pHealthExamTime!=null">
+                p_health_exam_time,
+            </if>
+            <if test="pIc!=null and pIc!=''">
+                p_ic
+            </if>
+        </trim>
+    </sql>
+    <sql id="addPatientC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="pName!=null and pName!=''">
+                #{pName},
+            </if>
+            <if test="pGender!=null and pGender!='' or pGender==0">
+                #{pGender},
+            </if>
+            <if test="pPhone!=null and pPhone!=''">
+                #{pPhone},
+            </if>
+            <if test="pBirth!=null">
+                #{pBirth},
+            </if>
+            <if test="pMariage!=null and pMariage!='' or pMariage==0">
+                #{pMariage},
+            </if>
+            <if test="pHome!=null and pHome!=''">
+                #{pHome},
+            </if>
+            <if test="pDayPhysican!=null and pDayPhysican!=''">
+                #{pDayPhysican},
+            </if>
+            <if test="pHealthExamTime!=null">
+                #{pHealthExamTime},
+            </if>
+            <if test="pIc!=null and pIc!=''">
+                #{pIc}
+            </if>
+        </trim>
+    </sql>
+    <!--更新字段-->
+    <sql id="modifyPatientC">
+        <set>
+            <if test="pName!=null and pName!=''">
+                p_name = #{pName},
+            </if>
+            <if test="pGender!=null and pGender!='' or pGender==0">
+                p_gender = #{pGender},
+            </if>
+            <if test="pPhone!=null and pPhone!=''">
+                p_phone = #{pPhone},
+            </if>
+            <if test="pBirth!=null">
+                p_birth = #{pBirth},
+            </if>
+            <if test="pMariage!=null and pMariage!='' or pMariage==0">
+                p_mariage = #{pMariage},
+            </if>
+            <if test="pHome!=null and pHome!=''">
+                p_home = #{pHome},
+            </if>
+            <if test="pDayPhysican!=null and pDayPhysican!=''">
+                p_day_physican = #{pDayPhysican},
+            </if>
+            <if test="pHealthExamTime!=null">
+                p_health_exam_time = #{pHealthExamTime},
+            </if>
+            <if test="pIc!=null and pIc!=''">
+                p_ic = #{pIc}
+            </if>
+        </set>
+    </sql>
+
+    <!--多条件查询-->
+    <sql id="searchPatient">
+        <where>
+            <if test="sk.pName!=null and sk.pName!=''">
+                and p_name like concat('%',#{sk.pName},'%')
+            </if>
+            <if test="sk.dName!=null and sk.dName!=''">
+                and d_name like concat('%',#{sk.dName},'%')
+            </if>
+            <if test="sk.pIc!=null and sk.pIc!=''">
+                and p_ic = #{sk.pIc}
+            </if>
+        </where>
+    </sql>
+
+    <insert id="addPatient" useGeneratedKeys="true" keyProperty="pId">
+        insert into patient
+        <include refid="addPatientC1"></include>
+        value
+        <include refid="addPatientC2"></include>
+    </insert>
+
+    <select id="allPatientInfo" resultMap="PatientMap">
+        select *
+        from view_patient
+    </select>
+
+    <select id="getPatientInfo" resultMap="PatientMap">
+        select *
+        from view_patient limit #{page},#{limit}
+    </select>
+
+    <select id="getAllPatientinfo" resultMap="PatientMap">
+        select *
+        from view_patient
+    </select>
+
+    <select id="searchPatientInfo" resultMap="PatientMap">
+        select * from view_patient
+        <include refid="searchPatient"></include>
+        limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllPatientInfo" resultMap="PatientMap">
+        select * from view_patient
+        <include refid="searchPatient"></include>
+    </select>
+
+    <delete id="deleteManyPatient">
+        delete from patient where p_id in
+        <foreach collection="array" item="e" open="(" separator="," close=")">
+            #{e}
+        </foreach>
+    </delete>
+
+    <select id="patientInfoBypId" resultMap="PatientMap">
+        select *
+        from patient
+        where p_id = #{pId}
+    </select>
+
+    <update id="modifyPatient">
+        update patient
+        <include refid="modifyPatientC"></include>
+        where p_id = #{pId}
+    </update>
+
+    <delete id="deletePatient">
+        delete from patient where p_id = #{pId}
+    </delete>
+
+    <select id="patientInfoBypIc" resultMap="PatientMap">
+        select * from patient
+        where p_ic = #{pIc}
+    </select>
+
+    <select id="checkExistPatient" resultMap="PatientMap">
+        select * from patient
+        where p_ic = #{pIc1} and p_ic != #{pIc2}
+    </select>
+
+</mapper>

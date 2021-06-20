@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>添加设备</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/public.css}" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="layui-form layuimini-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">设备名称</label>
+            <div class="layui-input-block">
+                <select name="eId">
+                    <option th:each="item : ${allEInfo}" th:value="${item.eId}" th:text="${item.eName}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">回收人员</label>
+            <div class="layui-input-block">
+                <input type="text" name="reName" lay-verify="required" placeholder="请输入回收人员" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">回收人员联系方式</label>
+            <div class="layui-input-block">
+                <input type="text" name="rePhone" lay-verify="rePhone" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+            </div>
+        </div>
+    </div>
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    layui.use(['form','laydate'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery,
+            laydate = layui.laydate;
+
+        form.verify({
+            rePhone:function (value,item){
+                if(value.length == 0){
+                    return "手机号不能为空";
+                }
+                if(!(/^1[3-9]{1}[0-9]{9}$/.test(value))) {
+                    return "手机号格式不正确!";
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            var data = data.field;
+            $.ajax({
+                url: '/app/GenSys/recycle_equip.do',
+                method: 'post',
+                data: {
+                    eId:data.eId,
+                    reName:data.reName,
+                    rePhone:data.rePhone
+                },
+                dataType: 'json',
+                success(res) {
+                    layer.msg(res.msg, {icon: res.code, time: 800}, function () {
+                        parent.location.reload();
+                    });
+                }
+            })
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

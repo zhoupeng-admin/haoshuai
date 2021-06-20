@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/public.css}" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+        input[readonly]{
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="sName" lay-verify="required" lay-reqtext="姓名不能为空" placeholder="请输入姓名"
+                   class="layui-input" th:value="${sInfo.getSName()}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">性别</label>
+        <div class="layui-input-block">
+            <input type="radio" name="sGender" value="0" title="男" th:checked="${sInfo.getsGender() == 0}">
+            <input type="radio" name="sGender" value="1" title="女" th:checked="${sInfo.getsGender() == 1}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="sWstatus" value="0" title="在职" th:checked="${sInfo.getsWstatus() == 0}">
+            <input type="radio" name="sWstatus" value="1" title="离职" th:checked="${sInfo.getsWstatus() == 1}">
+            <input type="radio" name="sWstatus" value="2" title="休假" th:checked="${sInfo.getsWstatus() == 2}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">身份证</label>
+        <div class="layui-input-block">
+            <input type="text" name="sIc" placeholder="请输入身份证" th:value="${sInfo.getsIc()}" lay-verify="sIc" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">手机</label>
+        <div class="layui-input-block">
+            <input type="text" name="sPhone" lay-verify="sPhone" th:value="${sInfo.getsPhone()}" lay-reqtext="手机不能为空" placeholder="请输入手机" value=""
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">身份选择</label>
+        <div class="layui-input-block">
+            <select name="sIdentity">
+                <option value="0" th:checked="${sInfo.getsIc() == 0}">法人代表</option>
+                <option value="1" th:checked="${sInfo.getsIc() == 1}">法定代表人</option>
+                <option value="2" th:checked="${sInfo.getsIc() == 2}">股东</option>
+                <option value="3" th:checked="${sInfo.getsIc() == 3}">董事</option>
+                <option value="4" th:checked="${sInfo.getsIc() == 4}">监事</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+</div>
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        form.verify({
+            sPhone:function (value,item){
+                if(value.length == 0){
+                    return "手机号不能为空";
+                }
+                if(!(/^1[3-9]{1}[0-9]{9}$/.test(value))) {
+                    return "手机号格式不正确!";
+                }
+            },
+            sIc:function (value,item){
+                if(value.length == 0){
+                    return "身份证不能为空";
+                }
+                if(!(/(^\d{15}$)|(^\d{17}(x|X|\d)$)/).test(value)){
+                    return "身份证格式不正确";
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            var data = data.field;
+            console.log(data);
+            $.ajax({
+                url:'/app/Hr/modify_staff.do',
+                data:{
+                    sId:[[${sInfo.getsId()}]],
+                    sName:data.sName,
+                    sGender:data.sGender,
+                    sPhone:data.sPhone,
+                    sIdentity:data.sIdentity,
+                    sWstatus:data.sWstatus,
+                    sIc:data.sIc
+                },
+                method:'post',
+                dataType:'json',
+                success(res){
+                    layer.msg(res.msg,{icon:res.code,time:800},function () {
+                        parent.location.reload();
+                    })
+                }
+            })
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

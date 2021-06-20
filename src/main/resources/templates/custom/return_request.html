@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>我的地址-用户中心</title>
+    <meta name="keywords" content="DeathGhost"/>
+    <meta name="description" content="DeathGhost"/>
+    <meta name="author" content="DeathGhost,deathghost@deathghost.cn">
+    <link rel="icon" th:href="@{images/icon/favicon.ico}" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" th:href="@{css/style.css}"/>
+    <script src="js/html5.js"></script>
+    <script th:src="@{js/jquery.js}"></script>
+    <script th:src="@{js/swiper.min.js}"></script>
+    <script>
+        $(document).ready(function () {
+            $("nav .indexAsideNav").hide();
+            $("nav .category").mouseover(function () {
+                $(".asideNav").slideDown();
+            });
+            $("nav .asideNav").mouseleave(function () {
+                $(".asideNav").slideUp();
+            });
+        });
+    </script>
+</head>
+<body>
+
+
+<!--右侧：内容区域-->
+<div class=" layuimini-form layui-form">
+    <table class="order_table">
+        <tr>
+            <td width="100" align="right">订单编号：</td>
+            <td><input type="text" name="oNo" lay-verify="required" th:value="${oInfo.getoNo()}" readonly/></td>
+        </tr>
+        <tr>
+            <td width="100" align="right">退款账号：</td>
+            <td><input type="text" name="feOutCount" lay-verify="required" placeholder="请输入退款账号" class="textbox"/></td>
+        </tr>
+        <tr>
+            <td width="100" align="right"></td>
+            <td><input type="button" value="确认退款" class="group_btn" lay-submit lay-filter="save"/></td>
+        </tr>
+    </table>
+</div>
+<script th:src="@{/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        form.on('submit(save)', function (data) {
+            var data = data.field;
+            $.ajax({
+                url: '/app/Custom/return_request.do',
+                method: 'post',
+                data: {
+                    oId: [[${oInfo.getoId()}]],
+                    oPayTime:getTime(),
+                    feOperateTime:getTime(),
+                    fePrice:[[${oInfo.getoTotalPrice()}]],
+                    feOutCount:$("input[name='feOutCount']").val(),
+                },
+                dataType: "json",
+                success: function (res) {
+                    layer.msg(res.msg, {icon: res.code, time: 800}, function () {
+                        parent.location.reload();
+                    })
+                }
+            })
+        })
+    })
+    function getTime() {
+        var date = new Date();
+        Y = date.getFullYear() + '-';
+        M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+        D = date.getDate() + ' ';
+        h = date.getHours() + ':';
+        m = date.getMinutes() + ':';
+        s = date.getSeconds();
+        return Y + M + D + h + m + s;
+    }
+</script>
+</body>
+</html>

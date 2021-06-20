@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.StaffMapper">
+    <resultMap id="SMap" type="com.haoshuai.app.entity.Staff">
+        <id column="s_id" property="sId"/>
+        <result column="s_name" property="sName"/>
+        <result column="s_gender" property="sGender"/>
+        <result column="s_phone" property="sPhone"/>
+        <result column="s_identity" property="sIdentity"/>
+        <result column="s_ic" property="sIc"/>
+        <result column="s_wstatus" property="sWstatus"/>
+    </resultMap>
+
+    <sql id="addSC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="sName!=null and sName!=''">
+                s_name,
+            </if>
+            <if test="sGender!=null and sGender!=''">
+                s_gender,
+            </if>
+            <if test="sPhone!=null and sPhone!=''">
+                s_phone,
+            </if>
+            <if test="sIc!=null and sIc!=''">
+                s_ic,
+            </if>
+            <if test="sIdentity!=null and sIdentity!='' or sIdentity==0">
+                s_identity,
+            </if>
+            <if test="sWstatus!=null and sWstatus!='' or sWstatus==0">
+                s_wstatus
+            </if>
+        </trim>
+    </sql>
+    <sql id="addSC2">
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sName!=null and sName!=''">
+                #{sName},
+            </if>
+            <if test="sGender!=null and sGender!=''">
+                #{sGender},
+            </if>
+            <if test="sPhone!=null and sPhone!=''">
+                #{sPhone},
+            </if>
+            <if test="sIc!=null and sIc!=''">
+                #{sIc},
+            </if>
+            <if test="sIdentity!=null and sIdentity!='' or sIdentity==0">
+                #{sIdentity},
+            </if>
+            <if test="sWstatus!=null and sWstatus!='' or sWstatus==0">
+                #{sWstatus}
+            </if>
+        </trim>
+    </sql>
+    <sql id="searchSC">
+        <where>
+            <if test="sk.sPhone!=null and sk.sPhone!=''">
+                and s_phone like concat('%',#{sk.sPhone},'%')
+            </if>
+            <if test="sk.sName!=null and sk.sName!=''">
+                and s_name like concat('%',#{sk.sName},'%')
+            </if>
+            <if test="sk.sIc!=null and sk.sIc!=''">
+                and s_ic like concat('%',#{sk.sIc},'%')
+            </if>
+        </where>
+    </sql>
+    <sql id="modifySC">
+        <set>
+            <if test="sName!=null and sName!=''">
+                s_name = #{sName},
+            </if>
+            <if test="sGender!=null and sGender!='' or sGender==0">
+                s_gender = #{sGender},
+            </if>
+            <if test="sPhone!=null and sPhone!=''">
+                s_phone = #{sPhone},
+            </if>
+            <if test="sIdentity!=null and sIdentity!='' or sIdentity==0">
+                s_identity = #{sIdentity},
+            </if>
+            <if test="sIc!=null and sIc!=''">
+                s_ic = #{sIc},
+            </if>
+            <if test="sWstatus!=null and sWstatus!='' or sWstatus==0">
+                s_wstatus = #{sWstatus}
+            </if>
+        </set>
+    </sql>
+
+    <select id="checkIsExistStaffBysIc" resultMap="SMap">
+        select *
+        from staff
+        where s_ic = #{sIc}
+    </select>
+
+    <insert id="addStaff">
+        insert into staff <include refid="addSC1"></include> value
+        <include refid="addSC2"></include>
+    </insert>
+
+    <select id="getStaffInfo" resultMap="SMap">
+        select *
+        from staff limit #{page},#{limit}
+    </select>
+
+    <select id="getAllStaffInfo" resultMap="SMap">
+        select *
+        from staff
+    </select>
+
+    <select id="searchStaffInfo" resultMap="SMap">
+        select *
+        from staff
+        <include refid="searchSC"></include>
+        limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllStaffInfo" resultMap="SMap">
+        select * from staff
+        <include refid="searchSC"></include>
+    </select>
+
+    <delete id="deleteManyStaff">
+        delete from staff where s_id in
+        <foreach collection="array" item="e" open="(" separator="," close=")">
+            #{e}
+        </foreach>
+    </delete>
+
+    <select id="staffInfoById" resultMap="SMap">
+        select *
+        from staff
+        where s_id = #{sId}
+    </select>
+
+    <select id="checkIsExistsIc" resultMap="SMap">
+        select *
+        from staff
+        where s_ic != #{sIc1}
+          and s_ic = #{sIc2}
+    </select>
+
+    <update id="modifyStaff">
+        update staff <include refid="modifySC"></include> where s_id = #{sId}
+    </update>
+
+    <delete id="deleteStaff">
+        delete
+        from staff
+        where s_id = #{sId}
+    </delete>
+</mapper>

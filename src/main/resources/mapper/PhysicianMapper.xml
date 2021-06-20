@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoshuai.app.mapper.PhysicianMapper">
+    <resultMap id="PhysicianMap" type="com.haoshuai.app.entity.Physician">
+        <id column="p_id" property="pId"/>
+        <result column="p_no" property="pNo"/>
+        <result column="p_name" property="pName"/>
+        <result column="p_gender" property="pGender"/>
+        <result column="p_phone" property="pPhone"/>
+        <result column="p_wstatus" property="pWstatus"/>
+        <result column="p_sno" property="pSno"/>
+        <association property="section" javaType="com.haoshuai.app.entity.Section">
+            <id column="s_id" property="sId"/>
+            <result column="s_no" property="sNo"/>
+            <result column="s_name" property="sName"/>
+            <result column="s_category" property="sCategory"/>
+        </association>
+    </resultMap>
+
+    <!--插入医生信息字段1-->
+    <sql id="addPhysicianC1">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="pNo!=null and pNo!=''">
+                p_no,
+            </if>
+            <if test="pName!=null and pName!=''">
+                p_name,
+            </if>
+            <if test="pGender!=null and pGender!='' or pGender==0">
+                p_gender,
+            </if>
+            <if test="pPhone!=null and pPhone!=''">
+                p_phone,
+            </if>
+            <if test="pWstatus!=null and pWstatus!='' or pWstatus==0">
+                p_wstatus,
+            </if>
+            <if test="pSno!=null and pSno!=''">
+                p_sno
+            </if>
+        </trim>
+    </sql>
+    <!--插入医生信息字段2-->
+    <sql id="addPhysicianC2">
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="pNo!=null and pNo!=''">
+                #{pNo},
+            </if>
+            <if test="pName!=null and pName!=''">
+                #{pName},
+            </if>
+            <if test="pGender!=null and pGender!='' or pGender==0">
+                #{pGender},
+            </if>
+            <if test="pPhone!=null and pPhone!=''">
+                #{pPhone},
+            </if>
+            <if test="pWstatus!=null and pWstatus!='' or pWstatus==0">
+                #{pWstatus},
+            </if>
+            <if test="pSno!=null and pSno!=''">
+                #{pSno}
+            </if>
+        </trim>
+    </sql>
+    <!--多条件查询字段-->
+    <sql id="searchPhysicianC">
+        <where>
+            <if test="sk.pNo!=null and sk.pNo!=''">
+                and p_no = #{sk.pNo}
+            </if>
+            <if test="sk.pName!=null and sk.pName!=''">
+                and p_name = #{sk.pName}
+            </if>
+            <if test="sk.pSno!=null and sk.pSno!=''">
+                and p_sno = #{sk.pSno}
+            </if>
+        </where>
+    </sql>
+    <!--更新医生信息字段-->
+    <sql id="modifyPhysicianC">
+        <set>
+            <if test="pName!=null and pName!=''">
+                p_name = #{pName},
+            </if>
+            <if test="pGender!=null and pGender!='' or pGender==0">
+                p_gender = #{pGender},
+            </if>
+            <if test="pPhone!=null and pPhone!=''">
+                p_phone  = #{pPhone},
+            </if>
+            <if test="pWstatus!=null and pWstatus!='' or pWstatus==0">
+                p_wstatus = #{pWstatus},
+            </if>
+            <if test="pSno!=null and pSno!=''">
+                p_sno = #{pSno}
+            </if>
+        </set>
+    </sql>
+
+    <select id="physicianInfo" resultMap="PhysicianMap">
+        select *  from physician
+        where p_no = #{pNo}
+    </select>
+    
+    <insert id="addPhysician">
+        insert into physician
+        <include refid="addPhysicianC1"></include>
+        value 
+        <include refid="addPhysicianC2"></include>
+    </insert>
+
+    <select id="getPhysicianInfo" resultMap="PhysicianMap">
+        select * from view_physician
+        limit #{page},#{limit}
+    </select>
+
+    <select id="getAllPhysicianInfo" resultMap="PhysicianMap">
+        select * from view_physician
+    </select>
+
+    <select id="searchPhysicianInfo" resultMap="PhysicianMap">
+        select * from view_physician
+        <include refid="searchPhysicianC"></include>
+        limit #{page},#{limit}
+    </select>
+
+    <select id="searchAllPhysicianInfo"  resultMap="PhysicianMap">
+        select * from view_physician
+        <include refid="searchPhysicianC"></include>
+    </select>
+
+    <delete id="deletePhysician">
+        delete from physician
+        where p_no = #{pNo}
+    </delete>
+
+    <select id="physicianInfo1" resultMap="PhysicianMap">
+        select * from view_physician
+        where p_no = #{pNo}
+    </select>
+
+    <update id="modifyPhysician">
+        update physician
+        <include refid="modifyPhysicianC"></include>
+        where p_no = #{pNo}
+    </update>
+
+    <delete id="deletemanyPhysician">
+        delete from physician
+        where p_no in
+        <foreach collection="array" item="e" open="(" separator="," close=")">
+            #{e}
+        </foreach>
+    </delete>
+</mapper>
